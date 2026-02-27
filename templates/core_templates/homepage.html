@@ -1,0 +1,301 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopix - Online Shopping</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --color-dark: #343131;
+            --color-red-accent: #A04747;
+            --color-gold-accent: #D8A25E;
+            --color-cream-accent: #EEDF7A;
+        }
+        /* Hide scrollbar for category menu but allow scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Hide scrollbar for the new dropdown */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans flex flex-col min-h-screen text-[#343131]">
+
+    <header class="bg-[#343131] sticky top-0 z-50">
+        <div class="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            
+            <a href="#" class="flex items-center gap-2 flex-shrink-0">
+                <img src="{% static 'images/shopix_logo.jpg' %}" alt="Shopix Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-cover rounded-sm">
+                <span class="hidden sm:block text-2xl md:text-3xl font-extrabold text-[#EEDF7A] tracking-wider">Shopix</span>
+            </a>
+
+            <div class="flex-1 max-w-4xl flex items-center hidden sm:flex">
+                <form action="" method="GET" class="w-full flex rounded-md overflow-hidden shadow-inner border border-transparent focus-within:border-[#D8A25E] transition-colors">
+                    {% csrf_token %}
+                    <select class="bg-gray-100 text-gray-700 px-3 py-2.5 text-sm border-r border-gray-300 focus:outline-none cursor-pointer hidden md:block">
+                        <option>All</option>
+                        <option>Electronics</option>
+                        <option>Fashion</option>
+                    </select>
+                    
+                    <input type="text" name="q" placeholder="Search for products, brands and more" required
+                           class="w-full px-4 py-2.5 text-gray-900 focus:outline-none">
+                           
+                    <button type="submit" class="bg-[#A04747] hover:bg-[#8c3d3d] text-white px-6 py-2.5 flex items-center justify-center transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex items-center space-x-4 md:space-x-6 flex-shrink-0 text-white">
+                
+                {% if user.is_authenticated %}
+                <div class="relative group hidden md:block">
+                    <a href="{% url 'profile' %}" class="flex flex-col hover:text-[#D8A25E] transition-colors cursor-pointer py-2">
+                        <span class="text-xs text-gray-300">Hello, {{ user.first_name|default:user.username }}</span>
+                        <span class="text-sm font-bold flex items-center gap-1">
+                            Account & Lists
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </a>
+
+                    <div class="absolute right-0 mt-1 w-64 bg-white rounded-md shadow-xl overflow-hidden z-50 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 border border-gray-200 origin-top text-[#343131]">
+                        <div class="p-2 flex flex-col max-h-[70vh] overflow-y-auto hide-scrollbar">
+                            
+                            <div class="px-4 py-3 mb-1 border-b border-gray-200">
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Signed in as</p>
+                                <p class="text-sm font-extrabold truncate text-[#A04747]">{{ user.username }}</p>
+                            </div>
+
+                            <a href="{% url 'profile' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">badge</span>
+                                <span class="font-bold text-sm">My Profile</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">inventory_2</span>
+                                <span class="font-bold text-sm">Orders</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">favorite_border</span>
+                                <span class="font-bold text-sm">Wishlist</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">notifications</span>
+                                <span class="font-bold text-sm">Notification</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">location_on</span>
+                                <span class="font-bold text-sm">Saved Address</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">credit_card</span>
+                                <span class="font-bold text-sm">Saved Cards</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:text-[#A04747] transition-colors group/item">
+                                <span class="material-icons text-[18px] text-gray-400 group-hover/item:text-[#A04747] transition-colors">card_giftcard</span>
+                                <span class="font-bold text-sm">Giftcards</span>
+                            </a>
+
+                            <div class="border-t border-gray-200 my-1"></div>
+                            
+                            <a href="{% url 'logout' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 transition-colors group/item">
+                                <span class="material-icons text-[18px] text-red-400 group-hover/item:text-red-700 transition-colors">logout</span>
+                                <span class="font-bold text-sm">Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="hover:text-[#D8A25E] font-bold transition-colors">Sign In</a>
+                    <a href="{% url 'register' %}" class="hover:text-[#D8A25E] font-bold transition-colors">Sign up</a>
+                {% endif %}
+
+                <div class="relative group hidden md:block">
+                    <button class="flex flex-col items-center hover:text-[#D8A25E] transition-colors cursor-pointer focus:outline-none py-2">
+                        <span class="text-xs text-gray-300">Discover</span>
+                        <span class="text-sm font-bold flex items-center gap-1">
+                            More
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </button>
+                    
+                    <div class="absolute right-0 mt-1 w-56 bg-white rounded-md shadow-xl overflow-hidden z-50 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 border border-gray-200 origin-top">
+                        <div class="py-2">
+                            <a href="#" class="px-4 py-3 text-sm font-medium text-[#343131] hover:bg-gray-50 hover:text-[#A04747] flex items-center gap-3 transition-colors">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                Notifications
+                            </a>
+                            <a href="{% url 'register' %}" class="px-4 py-3 text-sm font-medium text-[#343131] hover:bg-gray-50 hover:text-[#D8A25E] flex items-center gap-3 transition-colors border-t border-gray-100">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Become a Seller
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="#" class="flex items-end hover:text-[#D8A25E] transition-colors relative">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span class="absolute top-0 left-4 bg-[#EEDF7A] text-[#343131] text-xs font-extrabold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    <span class="text-sm font-bold hidden md:block ml-1">Cart</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="sm:hidden px-4 pb-3">
+            <form action="" method="GET" class="w-full flex rounded-md overflow-hidden">
+                <input type="text" name="q" placeholder="Search Shopix" required class="w-full px-4 py-2 text-gray-900 focus:outline-none">
+                <button type="submit" class="bg-[#A04747] text-white px-4 py-2 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white border-b border-gray-200">
+            <div class="max-w-[1600px] mx-auto px-4 py-2 flex items-center gap-6 overflow-x-auto no-scrollbar text-sm font-bold text-[#343131] whitespace-nowrap">
+                <a href="#" class="hover:text-[#A04747] flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    All
+                </a>
+                <a href="#" class="hover:text-[#A04747]">Today's Deals</a>
+                <a href="#" class="hover:text-[#A04747]">Mobiles</a>
+                <a href="#" class="hover:text-[#A04747]">Electronics</a>
+                <a href="#" class="hover:text-[#A04747]">Fashion</a>
+                <a href="#" class="hover:text-[#A04747]">Home & Kitchen</a>
+                <a href="#" class="hover:text-[#A04747]">Customer Service</a>
+                <a href="#" class="hover:text-[#A04747] text-[#D8A25E]">New Releases</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto w-full px-2 sm:px-4 py-6 space-y-6">
+        
+        <div class="w-full h-48 md:h-80 bg-[#343131] rounded-xl flex items-center justify-between px-8 md:px-16 overflow-hidden relative shadow-md">
+            <div class="absolute inset-0 opacity-20">
+                <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <polygon fill="#A04747" points="0,100 100,0 100,100"/>
+                </svg>
+            </div>
+            <div class="relative z-10 text-white">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-[#EEDF7A] mb-2">The Big Shopix Sale</h2>
+                <p class="text-lg md:text-2xl font-medium mb-6">Up to 60% off on top brands.</p>
+                <a href="#" class="bg-[#A04747] hover:bg-[#8c3d3d] text-white px-6 py-3 rounded-md font-bold transition-colors uppercase tracking-wide">
+                    Shop Now
+                </a>
+            </div>
+            <div class="hidden md:block relative z-10 text-[#D8A25E] opacity-50">
+                <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 20 20"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+            </div>
+        </div>
+
+        <section class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between mb-4 border-b pb-2 border-gray-100">
+                <h3 class="text-2xl font-bold text-[#343131]">Deals of the Day</h3>
+                <a href="#" class="text-[#A04747] font-semibold hover:underline">See all deals</a>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="group cursor-pointer">
+                    <div class="bg-gray-50 h-40 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-gray-100">
+                        <img src="https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=600&q=90" 
+                             alt="Smartphone" 
+                             class="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-[#A04747] text-white text-xs font-bold px-2 py-1 rounded">20% off</span>
+                        <span class="text-xs font-bold text-[#A04747]">Deal</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-800 line-clamp-1">Latest Smartphones</p>
+                </div>
+
+                <div class="group cursor-pointer">
+                    <div class="bg-gray-50 h-40 rounded-lg mb-2 flex items-center justify-center overflow-hidden border border-gray-100">
+                        <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=600&q=90" 
+                             alt="Laptops" 
+                             class="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-[#A04747] text-white text-xs font-bold px-2 py-1 rounded">Up to 40% off</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-800 line-clamp-1">Laptops & Monitors</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-xl font-bold text-[#343131] mb-4">Upgrade your home</h3>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80" alt="Furniture" class="w-full h-28 object-cover rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80" alt="Decor" class="w-full h-28 object-cover rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=400&q=80" alt="Kitchen" class="w-full h-28 object-cover rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1543512214-318c7553f230?auto=format&fit=crop&w=400&q=80" alt="Smart Home" class="w-full h-28 object-cover rounded-md shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
+                </div>
+                <a href="#" class="text-[#A04747] font-semibold hover:underline text-sm">Shop now</a>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-xl font-bold text-[#343131] mb-4">Men's Fashion</h3>
+                <div class="h-[240px] rounded-md mb-4 overflow-hidden shadow-sm cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=600&q=80" alt="Men's Fashion" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                <a href="#" class="text-[#A04747] font-semibold hover:underline text-sm">Explore category</a>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-xl font-bold text-[#343131] mb-4">Electronics & Accessories</h3>
+                <div class="h-[240px] rounded-md mb-4 overflow-hidden shadow-sm cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=80" alt="Electronics" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                </div>
+                <a href="#" class="text-[#A04747] font-semibold hover:underline text-sm">See more</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#343131] text-white mt-auto">
+        <div class="bg-[#4a4747] hover:bg-[#5a5757] text-center py-4 cursor-pointer transition-colors" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <span class="font-bold text-sm">Back to top</span>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+            <div>
+                <h4 class="font-bold mb-4 text-[#EEDF7A]">Get to Know Us</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">About Shopix</a></li>
+                    <li><a href="#" class="hover:underline">Careers</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-[#EEDF7A]">Make Money with Us</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">Sell products on Shopix</a></li>
+                    <li><a href="#" class="hover:underline">Become an Affiliate</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-[#EEDF7A]">Let Us Help You</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:underline">Your Account</a></li>
+                    <li><a href="#" class="hover:underline">Returns Centre</a></li>
+                    <li><a href="#" class="hover:underline">Help</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-600 py-6 text-center text-xs text-gray-400">
+            <p>&copy; 2026 Shopix. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
