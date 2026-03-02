@@ -11,21 +11,16 @@ def customer_home_view(request):
 @login_required(login_url='login')
 def profile_view(request):
     user = request.user
-
     if request.method == "POST":
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
-
-        
         user.phone_number = request.POST.get('phone')
-        image = request.FILES.get('profile_pic')
-
+        image = request.FILES.get('profile_image')
         if image:
             user.profile_image = image
         user.save()
 
         messages.success(request, "Profile updated successfully")
-
         return redirect('profile')  
 
     return render(request, 'customer_templates/profilepage.html', {'user': user})
@@ -33,3 +28,6 @@ def profile_view(request):
 
 def dashboard_view(request):
     return render(request,'customer_templates/coustomer_dashboard.html')
+    return redirect('profile')
+    return render(request, 'customer_templates/profilepage.html', {'user': user})
+
