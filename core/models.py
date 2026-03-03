@@ -66,6 +66,8 @@ class Category(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
+    def __str__(self):
+        return self.name
 
 
 
@@ -89,6 +91,9 @@ class SubCategory(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
+        
+    def __str__(self):
+        return self.name
 
 
 
