@@ -4,11 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 @login_required(login_url='login')
-def customer_home_view(request):
-    return render(request, 'customer_templates/homepage.html')
-
-
-@login_required(login_url='login')
 def profile_view(request):
     user = request.user
     if request.method == "POST":
@@ -28,6 +23,11 @@ def profile_view(request):
 
 def dashboard_view(request):
     return render(request,'customer_templates/coustomer_dashboard.html')
-    return redirect('profile')
-    return render(request, 'customer_templates/profilepage.html', {'user': user})
+    # return redirect('profile')
+    # return render(request, 'customer_templates/profilepage.html', {'user': user})
 
+def cart_view(request):
+    return render(request,'customer_templates/cart.html')
+
+# def add_cart(request):
+#     variant=get_object_or_404()
