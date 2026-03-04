@@ -22,6 +22,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField()
     brand = models.CharField(max_length=100)
+    price = models.IntegerField(default=0)
     model_number = models.CharField(max_length=100)
     is_cancellable = models.BooleanField(default=True)
     is_returnable = models.BooleanField(default=True)
@@ -43,6 +44,9 @@ class Product(models.Model):
 
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants")
     sku_code = models.CharField(max_length=100, unique=True)
@@ -58,11 +62,13 @@ class ProductVariant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class ProductImage(models.Model):
-    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="images")
-    image_url = models.URLField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="products/")
     alt_text = models.CharField(max_length=255, blank=True)
     is_primary = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.product.name
 class Attribute(models.Model):
     name = models.CharField(max_length=100) # e.g., Color, Size
 
