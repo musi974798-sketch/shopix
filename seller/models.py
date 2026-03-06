@@ -63,12 +63,13 @@ class ProductVariant(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="products/")
+    image = models.ImageField(upload_to="productimages/")
     alt_text = models.CharField(max_length=255, blank=True)
     is_primary = models.BooleanField(default=False)
 
     def __str__(self):
         return self.product.name
+    
 class Attribute(models.Model):
     name = models.CharField(max_length=100) # e.g., Color, Size
 

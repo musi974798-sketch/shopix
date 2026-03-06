@@ -3,9 +3,6 @@ from django.forms import inlineformset_factory
 from .models import Product, ProductImage
 
 
-from django import forms
-from .models import Product
-
 class ProductForm(forms.ModelForm):
 
     class Meta:
@@ -13,7 +10,7 @@ class ProductForm(forms.ModelForm):
         fields = [
             "name",
             "brand",
-            'price',
+            "price",
             "model_number",
             "subcategory",
             "description",
@@ -29,7 +26,7 @@ class ProductForm(forms.ModelForm):
             "brand": forms.TextInput(attrs={
                 "class": "w-full rounded-xl border-gray-300 focus:ring-primary focus:border-primary"
             }),
-             "price": forms.TextInput(attrs={
+            "price": forms.NumberInput(attrs={
                 "class": "w-full rounded-xl border-gray-300 focus:ring-primary focus:border-primary"
             }),
             "model_number": forms.TextInput(attrs={
@@ -49,24 +46,23 @@ class ProductForm(forms.ModelForm):
 
 
 class ProductImageForm(forms.ModelForm):
+
     class Meta:
         model = ProductImage
         fields = ["image"]
 
+        widgets = {
+            "image": forms.FileInput(attrs={
+                "class": "hidden"
+            })
+        }
+
 
 ProductImageFormSet = inlineformset_factory(
     Product,
     ProductImage,
     form=ProductImageForm,
-    extra=4,   # shows 4 upload boxes
+    fields=["image"],
+    extra=4,          # shows 4 upload boxes
     can_delete=True
-)
-
-
-ProductImageFormSet = inlineformset_factory(
-    Product,
-    ProductImage,
-    form=ProductImageForm,
-    extra=1,
-    can_delete=False
 )

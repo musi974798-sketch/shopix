@@ -21,34 +21,28 @@ def seller_home_view(request):
 @login_required(login_url='login')
 def addproduct(request):
 
-    seller_profile = get_object_or_404(SellerProfile, user=request.user)
+    seller = request.user.seller_profile
+    product = Product(seller=seller)
 
     if request.method == "POST":
-        form = ProductForm(request.POST)
-        formset = ProductImageFormSet(request.POST, request.FILES)
+
+        form = ProductForm(request.POST, instance=product)
+        formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
 
         if form.is_valid() and formset.is_valid():
-            product = form.save(commit=False)
-            product.seller = seller_profile
 
-            if "draft" in request.POST:
-                product.is_draft = True
-
-            product.save()
-
-            formset.instance = product
+            product = form.save()
             formset.save()
 
-            messages.success(request, "Product added successfully!")
             return redirect("sellerhome")
 
     else:
-        form = ProductForm()
-        formset = ProductImageFormSet()
+        form = ProductForm(instance=product)
+        formset = ProductImageFormSet(instance=product)
 
     return render(request, "seller_templates/add_product.html", {
         "form": form,
-        "formset": formset,
+        "formset": formset
     })
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)

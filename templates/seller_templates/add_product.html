@@ -1,196 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>E-SHOP | Add Product</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-SHOP | Add Product</title>
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#FFBF00",
-                    },
-                },
+<script>
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                primary: "#FFBF00",
             },
-        }
-    </script>
+        },
+    },
+}
+</script>
+
+<style>
+input[type=file]{
+display:none;
+}
+</style>
+
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans p-6 md:p-10">
 
 <form method="post" enctype="multipart/form-data"
-      class="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8">
+class="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl p-8">
 
-    {% csrf_token %}
-    {{ formset.management_form }}
+{% csrf_token %}
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8 border-b pb-6">
-        <div>
-            <h1 class="text-3xl font-bold">
-                Add <span class="text-primary">New Product</span>
-            </h1>
-            <p class="text-sm text-gray-500">
-                Fill product details carefully before publishing.
-            </p>
-        </div>
+<div class="flex justify-between items-center mb-8 border-b pb-6">
 
-        <button type="submit" name="draft"
-            class="px-6 py-2 border rounded-lg text-sm font-semibold
-                   hover:bg-gray-100 transition">
-            Save Draft
-        </button>
-    </div>
+<div>
+<h1 class="text-3xl font-bold">
+Add <span class="text-primary">New Product</span>
+</h1>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<p class="text-sm text-gray-500">
+Fill product details carefully before publishing.
+</p>
+</div>
 
-        <!-- LEFT SIDE - IMAGES -->
-        <div>
-            <h2 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">
-                Product Images
-            </h2>
+<button type="submit"
+class="px-6 py-2 border rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+Save Draft
+</button>
 
-            <div class="grid grid-cols-2 gap-4">
-                {% for image_form in formset %}
-                <div class="relative">
-                    {{ image_form.id }}
+</div>
 
-                    <input type="file"
-                           name="{{ image_form.image.name }}"
-                           id="{{ image_form.image.id_for_label }}"
-                           class="hidden"
-                           accept="image/*"
-                           onchange="previewImage(event, 'preview{{ forloop.counter }}')">
 
-                    <label for="{{ image_form.image.id_for_label }}"
-                        class="w-full h-48 flex items-center justify-center
-                               border-2 border-dashed border-gray-300
-                               rounded-xl cursor-pointer
-                               hover:border-primary hover:bg-gray-50
-                               transition overflow-hidden">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
-                        <img id="preview{{ forloop.counter }}"
-                             class="hidden w-full h-full object-cover rounded-xl"/>
 
-                        <span class="text-gray-400 text-sm">
-                            Upload Image
-                        </span>
-                    </label>
+<!-- LEFT SIDE IMAGE UPLOAD -->
 
-                    {% if image_form.image.errors %}
-                        <p class="text-red-500 text-xs mt-1">
-                            {{ image_form.image.errors }}
-                        </p>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+<div>
 
-        <!-- RIGHT SIDE - PRODUCT DETAILS -->
-        <div class="space-y-6">
+<h2 class="text-sm font-bold text-primary uppercase tracking-widest mb-4">
+Product Images
+</h2>
 
-            <!-- Name -->
-            <div>
-                <label class="block text-sm font-semibold mb-2">
-                    Product Name
-                </label>
-                {{ form.name }}
-            </div>
+{{ formset.management_form }}
 
-            <!-- Brand & Model -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-2">
-                        Brand
-                    </label>
-                    {{ form.brand }}
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">
-                        Model Number
-                    </label>
-                    {{ form.model_number }}
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold mb-2">
-                    Product Price
-                </label>
-                {{ form.price }}
-            </div>
+<div class="grid grid-cols-2 gap-4">
 
-            <!-- Category -->
-            <div>
-                <label class="block text-sm font-semibold mb-2">
-                    Sub Category
-                </label>
-                {{ form.subcategory }}
-            </div>
+{% for image_form in formset %}
 
-            <!-- Description -->
-            <div>
-                <label class="block text-sm font-semibold mb-2">
-                    Description
-                </label>
-                {{ form.description }}
-            </div>
+<div class="relative">
 
-            <!-- Return Settings -->
-            <div class="grid grid-cols-2 gap-4">
+{{ image_form.id }}
 
-                <div class="flex items-center gap-3">
-                    {{ form.is_cancellable }}
-                    <label class="text-sm font-medium">
-                        Cancellable
-                    </label>
-                </div>
+<label class="w-full h-48 flex items-center justify-center
+border-2 border-dashed border-gray-300
+rounded-xl cursor-pointer hover:border-primary
+hover:bg-gray-50 transition">
 
-                <div class="flex items-center gap-3">
-                    {{ form.is_returnable }}
-                    <label class="text-sm font-medium">
-                        Returnable
-                    </label>
-                </div>
+<img id="preview{{ forloop.counter }}"
+class="absolute inset-0 w-full h-full object-cover rounded-xl hidden">
 
-            </div>
+<input type="file"
+name="{{ image_form.image.name }}"
+id="{{ image_form.image.id_for_label }}"
+onchange="previewImage(event,'preview{{ forloop.counter }}')">
 
-            <div>
-                <label class="block text-sm font-semibold mb-2">
-                    Return Days
-                </label>
-                {{ form.return_days }}
-            </div>
+<span class="text-gray-400 text-sm">
+Upload Image
+</span>
 
-            <!-- Submit -->
-            <button type="submit"
-                class="w-full bg-primary text-black font-bold py-4 rounded-xl
-                       hover:opacity-90 transition">
-                Publish Product
-            </button>
+</label>
 
-        </div>
-    </div>
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+
+
+<!-- RIGHT SIDE PRODUCT FORM -->
+
+<div class="space-y-6">
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Product Name
+</label>
+{{ form.name }}
+</div>
+
+
+<div class="grid grid-cols-2 gap-4">
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Brand
+</label>
+{{ form.brand }}
+</div>
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Model Number
+</label>
+{{ form.model_number }}
+</div>
+
+</div>
+
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Product Price
+</label>
+{{ form.price }}
+</div>
+
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Sub Category
+</label>
+{{ form.subcategory }}
+</div>
+
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Description
+</label>
+{{ form.description }}
+</div>
+
+
+
+<div class="grid grid-cols-2 gap-4">
+
+<div class="flex items-center gap-3">
+{{ form.is_cancellable }}
+<label class="text-sm font-medium">
+Cancellable
+</label>
+</div>
+
+<div class="flex items-center gap-3">
+{{ form.is_returnable }}
+<label class="text-sm font-medium">
+Returnable
+</label>
+</div>
+
+</div>
+
+
+
+<div>
+<label class="block text-sm font-semibold mb-2">
+Return Days
+</label>
+{{ form.return_days }}
+</div>
+
+
+
+<button type="submit"
+class="w-full bg-primary text-black font-bold py-4 rounded-xl hover:opacity-90 transition">
+Publish Product
+</button>
+
+</div>
+
+</div>
 
 </form>
 
-<script>
-function previewImage(event, previewId) {
-    const input = event.target;
-    const preview = document.getElementById(previewId);
-    const text = preview.parentElement.querySelector("span");
 
-    if (input.files && input.files[0]) {
-        preview.src = URL.createObjectURL(input.files[0]);
-        preview.classList.remove("hidden");
-        text.classList.add("hidden");
-    }
+
+<script>
+
+function previewImage(event,previewId){
+
+const input = event.target
+const preview = document.getElementById(previewId)
+const text = preview.parentElement.querySelector("span")
+
+if(input.files && input.files[0]){
+
+preview.src = URL.createObjectURL(input.files[0])
+
+preview.classList.remove("hidden")
+text.classList.add("hidden")
+
 }
+
+}
+
 </script>
 
 </body>
+
 </html>
