@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 
-from seller.models import SellerProfile
+from seller.models import Product, SellerProfile
 
 User = get_user_model()
 
@@ -20,7 +20,7 @@ def login_view(request):
                 return redirect('sellerhome')
 
             elif user.role == 'CUSTOMER':
-                return redirect('customerhome')
+                return redirect('home')
 
             elif user.role == 'ADMIN':
                 return redirect('admin_dashboard')
@@ -121,7 +121,10 @@ def logout_view(request):
 
 
 def home_view(request):
+    products = Product.objects.all()
+    
+
     user=request.user
     if user.is_authenticated:
-        return render(request, 'core_templates/homepage.html')
-    return render(request, 'core_templates/homepage.html')
+        return render(request, 'core_templates/homepage.html', { 'products' : products })
+    return render(request, 'core_templates/homepage.html', { 'products' : products })
