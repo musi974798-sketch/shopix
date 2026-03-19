@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Product, ProductImage
+from .models import Product, ProductImage, SellerProfile
 
 
 class ProductForm(forms.ModelForm):
@@ -116,3 +116,15 @@ class EditProductForm(forms.ModelForm):
                 "class": "w-full rounded-xl border-gray-300 focus:ring-primary focus:border-primary"
             }),
         }
+
+class EditProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = SellerProfile
+        fields = [
+    "store_name",
+    "store_slug",
+    "gst_number",
+    "pan_number",
+    "bank_account_number",
+]

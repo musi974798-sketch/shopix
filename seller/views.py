@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from seller.forms import EditProductForm, ProductForm, ProductImageFormSet
+from seller.forms import EditProductForm, EditProfileForm, ProductForm, ProductImageFormSet
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -28,12 +28,35 @@ def product_detail(request, pk):
 
 @login_required(login_url='login')
 def sellerprofile(request):
+
     seller_profile = get_object_or_404(SellerProfile, user=request.user)
+
     products_count = Product.objects.filter(seller=seller_profile).count()
 
     return render(request, "seller_templates/seller_profile.html", {
         "seller": seller_profile,
         "products_count": products_count,
+    })
+
+@login_required(login_url='login')
+def edit_seller_profile(request):
+
+    seller = get_object_or_404(SellerProfile, user=request.user)
+
+    if request.method == "POST":
+        form = EditProfileForm(request.POST, request.FILES, instance=seller)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully")
+            return redirect("sellerprofile")
+
+    else:
+        form = EditProfileForm(instance=seller)
+
+    return render(request, "seller_templates/profile_edit.html", {
+        "form": form,
+        "seller": seller
     })
 
 @login_required(login_url='login')
@@ -101,6 +124,18 @@ def edit_product(request, slug):
         "formset": formset,
         "product": product
     })
+
+def productlist(request):
+    seller_profile = get_object_or_404(SellerProfile, user=request.user)
+
+    products = Product.objects.filter(seller=seller_profile)
+    return render(request, "seller_templates/product_list.html", {
+        'products': products,
+        'seller_profile':seller_profile,
+    })
+
+def order_view(request):
+    return render(request, "seller_templates/order_view.html")
 
 @login_required(login_url='login')
 def seller_logout(request):
