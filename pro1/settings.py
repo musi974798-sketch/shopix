@@ -5,13 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = 'django-insecure-4q)3u)$#d3+%b*_q^^b4abph6m^6k971-991$)r&i=xaeb+fcy'
-
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-key-here')
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
+# --- Application definition ---
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,11 +17,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    
+    # Your Apps
     'admin_app',
     'core',
     'customer',
     'seller',
+    
+    # Allauth & Social Auth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -33,6 +42,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'pro1.urls'
@@ -40,12 +50,12 @@ ROOT_URLCONF = 'pro1.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # ✅ fixed
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.template.context_processors.csrf',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -62,37 +72,58 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+# --- Custom User Model ---
+AUTH_USER_MODEL = 'core.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# --- Allauth Configuration ---
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = 'none' 
 
-USE_I18N = True
-USE_TZ = True
+# Custom Adapters
+ACCOUNT_ADAPTER = 'core.adapter.MyLoginAdapter'
+SOCIALACCOUNT_ADAPTER = 'core.adapter.MySocialAccountAdapter'
 
+# Auto-linking existing users (Fixes the "Final Step" issue)
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_AUTO_SIGNUP = True 
+
+# Redirects & UX
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
+
+# --- Static & Media ---
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
+STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
-AUTH_USER_MODEL = 'core.User'
-
-
-
+# --- Email ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
