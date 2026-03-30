@@ -84,7 +84,7 @@ class Product(models.Model):
     # ✅ Get display price from variants
     def get_price(self):
         return self.variants.aggregate(
-            Min('selling_price')
+            min('selling_price')
         )['selling_price__min']
 
     def __str__(self):
