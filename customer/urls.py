@@ -2,7 +2,7 @@
 from django.urls import path
 from .import views
 urlpatterns = [
-    path('profile/',views.profile_view,name='profile'),
+    path('customer_profile/',views.profile_view,name='profile'),
     path('dashboard/',views.dashboard_view,name='dashboard'),
     path('cart/',views.cart_view,name='cart'),
     path('add_to_cart/<uuid:variant_id>/', views.add_cart, name='add_to_cart'),

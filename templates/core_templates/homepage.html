@@ -205,8 +205,8 @@
                     </div>
 
                     <a href="{% url 'variant_page' variant.id %}" class="block relative aspect-video mb-6 overflow-hidden rounded-2xl bg-black/40 border border-white/5">
-                        {% if variant.images.first %}
-                            <img src="{{ variant.images.first.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100">
+                        {% if variant.product.images.first %}
+                            <img src="{{ variant.product.images.first.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100">
                         {% else %}
                             <div class="w-full h-full flex items-center justify-center text-white/5">
                                 <span class="material-icons text-5xl">inventory_2</span>

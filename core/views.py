@@ -192,7 +192,7 @@ def single_variant_view(request, id):
     """Render HTML for a single product variant."""
     variant = get_object_or_404(
         ProductVariant.objects.select_related('product__seller', 'product__subcategory')
-                              .prefetch_related('product__images', 'images'),
+                              .prefetch_related('product__images'),
         id=id
     )
     context = {
