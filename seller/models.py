@@ -1,5 +1,5 @@
-import uuid
 from django.db import models
+from core.models import User, SubCategory
 from django.utils.text import slugify
 
 from core.models import User
@@ -7,8 +7,7 @@ from core.models import User
 
 # ================= SELLER =================
 class SellerProfile(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField("core.User", on_delete=models.CASCADE, related_name="seller_profile")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="seller_profile")
     store_name = models.CharField(max_length=255)
     store_slug = models.SlugField(unique=True)
     gst_number = models.CharField(max_length=50)
@@ -19,11 +18,6 @@ class SellerProfile(models.Model):
     rating = models.FloatField(default=0)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        if self.store_name:
-            return self.store_name
-        return self.user.username
 
     def __str__(self):
         return self.store_name
@@ -51,6 +45,7 @@ class Product(models.Model):
 
     description = models.TextField()
     brand = models.CharField(max_length=100)
+    price = models.IntegerField(default=0)
     model_number = models.CharField(max_length=100)
 
     approval_status = models.CharField(
@@ -195,7 +190,6 @@ class Attribute(models.Model):
 
 
 class AttributeOption(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name="options")
     value = models.CharField(max_length=100)
 
@@ -204,11 +198,8 @@ class AttributeOption(models.Model):
 
 
 class VariantAttributeBridge(models.Model):
-    variant = models.ForeignKey("seller.ProductVariant", on_delete=models.CASCADE)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     option = models.ForeignKey(AttributeOption, on_delete=models.CASCADE)
-    
-    def __str__(self):
-        return f"{self.variant.sku_code} - {self.option}"
 
     def __str__(self):
         return f"{self.variant.sku_code} - {self.option.value}"
@@ -216,7 +207,7 @@ class VariantAttributeBridge(models.Model):
 
 # ================= INVENTORY =================
 class InventoryLog(models.Model):
-    variant = models.ForeignKey("seller.ProductVariant", on_delete=models.CASCADE)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     change_amount = models.IntegerField()
     reason = models.CharField(max_length=50)
     performed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

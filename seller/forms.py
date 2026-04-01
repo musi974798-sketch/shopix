@@ -2,7 +2,6 @@ from django import forms
 from django.forms import inlineformset_factory
 from .models import Product, ProductImage, ProductVariant, SellerProfile, AttributeOption
 
-
 input_classes = (
     "w-full rounded-xl border border-gray-300 py-3.5 px-5 "
     "focus:ring-primary focus:border-black focus:bg-white "

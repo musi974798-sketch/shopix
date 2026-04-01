@@ -75,7 +75,7 @@ def customer_register(request):
         send_mail(
             'Your OTP Code',
             f'Your OTP is {otp}',
-            'your_email@gmail.com',
+            settings.EMAIL_HOST_USER,
             [email],
             fail_silently=False,
         )
@@ -121,7 +121,7 @@ def seller_register(request):
         send_mail(
             'Your OTP Code',
             f'Your OTP is {otp}',
-            'your_email@gmail.com',
+            settings.EMAIL_HOST_USER,
             [email],
             fail_silently=False,
         )
@@ -270,29 +270,3 @@ def products(request):
 
 
 
-def search_view(request):
-    query = request.GET.get('q', '')
-    category = request.GET.get('category', 'all')
-    
-    # Start with all available products/variants
-    results = ProductVariant.objects.all()
-    
-    # Filter by search query
-    if query:
-        # Q objects allow you to search multiple fields at once (e.g., name OR brand)
-        results = results.filter(
-            Q(product__name__icontains=query) | 
-            Q(product__brand__icontains=query) |
-            Q(sku_code__icontains=query)
-        ).distinct()
-        
-    # Filter by category if one is selected
-    if category and category.lower() != 'all':
-        results = results.filter(product__category__name__icontains=category)
-        
-    context = {
-        'products': results, # We use 'products' so you can reuse your product card loop
-        'query': query,
-    }
-    
-    return render(request, 'core_templates/search_results.html', context)
