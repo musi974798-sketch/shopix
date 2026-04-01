@@ -40,10 +40,6 @@ class Migration(migrations.Migration):
                 ('brand', models.CharField(max_length=100)),
                 ('price', models.IntegerField(default=0)),
                 ('model_number', models.CharField(max_length=100)),
-<<<<<<< HEAD
-=======
-                ('status', models.CharField(choices=[('ACTIVE', 'Active'), ('INACTIVE', 'Inactive')], default='ACTIVE', max_length=10)),
->>>>>>> shopix/main
                 ('approval_status', models.CharField(choices=[('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected')], default='PENDING', max_length=20)),
                 ('is_active', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
@@ -52,7 +48,6 @@ class Migration(migrations.Migration):
         ),
         migrations.CreateModel(
             name='ProductImage',
-<<<<<<< HEAD
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('image', models.ImageField(upload_to='productimages/')),
@@ -88,38 +83,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-=======
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to='productimages/')),
-                ('alt_text', models.CharField(blank=True, max_length=255)),
-                ('is_primary', models.BooleanField(default=False)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='seller.product')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='ProductVariant',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sku_code', models.CharField(max_length=100, unique=True)),
-                ('mrp', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('selling_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('cost_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('stock_quantity', models.IntegerField(default=0)),
-                ('weight', models.FloatField(blank=True, help_text='Weight in kg', null=True)),
-                ('length', models.FloatField(blank=True, help_text='Length in cm', null=True)),
-                ('width', models.FloatField(blank=True, help_text='Width in cm', null=True)),
-                ('height', models.FloatField(blank=True, help_text='Height in cm', null=True)),
-                ('tax_percentage', models.FloatField(default=0)),
-                ('is_cancellable', models.BooleanField(default=True)),
-                ('is_returnable', models.BooleanField(default=True)),
-                ('return_days', models.IntegerField(default=7)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='variants', to='seller.product')),
-            ],
-        ),
-        migrations.CreateModel(
->>>>>>> shopix/main
             name='InventoryLog',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
