@@ -1,29 +1,11 @@
-# Product Save Fix - Approved Plan
+# SMTP Fix Progress
 
-## Steps:
+## Plan Steps:
+- [x] Step 1: Create .env file with Gmail credentials
+- [x] Step 2: Edit core/views.py to fix send_mail calls
+- [ ] Step 3: Test registration and restart server
 
-### 1. Update seller/forms.py
-- Change VariantFormSet extra=1 → extra=0 (make variants optional)
-
-### 2. Update seller/views.py
-- Ensure seller_profile exists for user
-- Make image/variant formsets optional (validate but allow empty)
-- Add subcategory queryset check
-- Improve error messages
-
-### 3. Test
-- Run `python manage.py runserver`
-- Go to seller/product/add/
-- Fill minimal product form (skip variants/images)
-- Submit and check console/page/DB
-
-### 4. Verify DB
-- `python manage.py shell`
-- `from seller.models import Product; Product.objects.all()`
-
-### 5. Handle remaining issues
-- If subcategory empty: create some
-- Migrate if needed
-
-**Current Progress:** Creating TODO.md ✅
-
+## Next Action
+1. Restart Django dev server if running: cd pro1 && python manage.py runserver
+2. Test buyer registration form at http://127.0.0.1:8000/buyerregister/
+3. Check if OTP email arrives in musi974798@gmail.com sent folder.

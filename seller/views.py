@@ -42,15 +42,8 @@ def addproduct(request):
             product.seller = seller
             product.save()
 
-            # ✅ SAVE IMAGES (MANUAL FIX)
-            files = request.FILES.getlist('image')
-
-            for i, file in enumerate(files):
-                ProductImage.objects.create(
-                    product=product,
-                    image=file,
-                    is_primary=True if i == 0 else False
-                )
+            image_formset.instance = product
+            image_formset.save()
 
             # ✅ SAVE VARIANTS
             variants = variant_formset.save(commit=False)

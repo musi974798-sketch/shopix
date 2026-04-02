@@ -1,3 +1,6 @@
-from django.shortcuts import render
+# Admin app views - Registration/Login moved to core app.
+# Use Django admin (/admin/) for admin tasks.
+# No custom views needed.
 
-# Create your views here.
+pass
+

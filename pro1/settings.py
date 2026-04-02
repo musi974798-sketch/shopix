@@ -13,7 +13,15 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
-# --- Application definition ---
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-key-here')
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
+# -----------------------------
+# Application Definition
+# -----------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -33,6 +41,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    # Google Provider
     'allauth.socialaccount.providers.google',
 ]
 
@@ -48,6 +58,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Allauth Middleware
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -119,8 +131,13 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': [
+            'profile',
+            'email'
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online'
+        },
         'OAUTH_PKCE_ENABLED': True,
     }
 }
@@ -141,13 +158,23 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 
-# --- Email ---
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+
+# -----------------------------
+# Media Files
+# -----------------------------
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# -----------------------------
+# Email Configuration (OTP / Verification)
+# -----------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 
 # --- Default Auto Field ---
