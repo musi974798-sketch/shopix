@@ -1,23 +1,37 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
 
+
+# =========================
+# Custom User Model
+# =========================
 class User(AbstractUser):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=15, unique=True, null=True)
 
     ROLE_CHOICES = (
         ('ADMIN', 'Admin'),
         ('SELLER', 'Seller'),
         ('CUSTOMER', 'Customer'),
     )
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
-    phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CUSTOMER')
-    profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
-    is_verified = models.BooleanField(default=False)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']  # keep this if using AbstractUser
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-   
+
+# =========================
+# Address Model
+# =========================
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
     full_name = models.CharField(max_length=100)
@@ -31,11 +45,17 @@ class Address(models.Model):
     landmark = models.CharField(max_length=255, blank=True)
     address_type = models.CharField(max_length=20)
     is_default = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    def __str__(self):
+        return f"{self.full_name} - {self.city}"
 
 
+# =========================
+# Notification Model
+# =========================
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     title = models.CharField(max_length=255)
@@ -43,16 +63,26 @@ class Notification(models.Model):
     image_url = models.URLField(blank=True, null=True)
     redirect_url = models.URLField(blank=True, null=True)
     is_read = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.title
+
+
+# =========================
+# Category Model
+# =========================
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
     image_url = models.URLField(blank=True, null=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.name)
@@ -66,18 +96,23 @@ class Category(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
 
-
+# =========================
+# SubCategory Model
+# =========================
 class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="subcategories")
     name = models.CharField(max_length=100)
-    slug = models.SlugField()
+    slug = models.SlugField(blank=True)
     is_active = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.name)
@@ -91,17 +126,25 @@ class SubCategory(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
-        
+
     def __str__(self):
         return self.name
 
 
-
+# =========================
+# Banner Model (FIXED)
+# =========================
 class Banner(models.Model):
     title = models.CharField(max_length=255)
     image_url = models.URLField()
     redirect_url = models.URLField(blank=True, null=True)
+
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+
     is_active = models.BooleanField(default=True)
-    
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

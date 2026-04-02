@@ -18,16 +18,23 @@ def login_view(request):
         if user is not None:
             login(request, user)
 
+            # ✅ Print logged-in user info
+            print(f"User logged in: {user.email} | Role: {user.role}")
+
             if user.role == 'SELLER':
+                print("Logged in as SELLER")
                 return redirect('sellerhome')
 
             elif user.role == 'CUSTOMER':
+                print("Logged in as CUSTOMER")
                 return redirect('home')
 
             elif user.role == 'ADMIN':
+                print("Logged in as ADMIN")
                 return redirect('admin_dashboard')
 
         else:
+            print("Login failed for:", email)
             messages.error(request, 'Invalid email or password. Please try again.')
 
     return render(request, 'core_templates/loginpage.html')

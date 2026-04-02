@@ -5,9 +5,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# --- Security ---
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-key-here')
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 # --- Application definition ---
 INSTALLED_APPS = [
@@ -18,14 +22,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
+
     # Your Apps
     'admin_app',
     'core',
     'customer',
     'seller',
-    
-    # Allauth & Social Auth
+
+    # Allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -34,6 +38,8 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+
+# --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -45,8 +51,11 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
+
 ROOT_URLCONF = 'pro1.urls'
 
+
+# --- Templates ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -55,7 +64,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # required for allauth
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -63,8 +72,11 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'pro1.wsgi.application'
 
+
+# --- Database ---
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -72,37 +84,38 @@ DATABASES = {
     }
 }
 
-# --- Custom User Model ---
+
+# --- Custom User ---
 AUTH_USER_MODEL = 'core.User'
 
+
+# --- Authentication Backends ---
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# --- Allauth Configuration ---
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_VERIFICATION = 'none' 
 
-# Custom Adapters
+# --- Allauth Configuration (UPDATED) ---
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+
+# --- Custom Adapters ---
 ACCOUNT_ADAPTER = 'core.adapter.MyLoginAdapter'
 SOCIALACCOUNT_ADAPTER = 'core.adapter.MySocialAccountAdapter'
 
-# Auto-linking existing users (Fixes the "Final Step" issue)
+
+# --- Social Account Settings ---
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-SOCIALACCOUNT_AUTO_SIGNUP = True 
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
-# Redirects & UX
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGOUT_ON_GET = True
-ACCOUNT_SESSION_REMEMBER = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -112,11 +125,21 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+
+# --- Redirects ---
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
+
+
 # --- Static & Media ---
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
+
 
 # --- Email ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -126,4 +149,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
+
+# --- Default Auto Field ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
