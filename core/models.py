@@ -1,4 +1,5 @@
 import uuid
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
@@ -8,6 +9,7 @@ from django.utils.text import slugify
 # Custom User Model
 # =========================
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ROLE_CHOICES = (
         ('ADMIN', 'Admin'),
@@ -24,7 +26,12 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    
+    def __str__(self):
+        return self.username
+
 class Address(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
     full_name = models.CharField(max_length=100)
@@ -35,7 +42,9 @@ class Address(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100, default="India")
+    country = models.CharField(max_length=100, default="India")
     landmark = models.CharField(max_length=255, blank=True)
+    address_type = models.CharField(max_length=20, choices=(('HOME', 'Home'), ('WORK', 'Work')))
     address_type = models.CharField(max_length=20, choices=(('HOME', 'Home'), ('WORK', 'Work')))
     is_default = models.BooleanField(default=False)
 
@@ -50,6 +59,7 @@ class Address(models.Model):
 # =========================
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     title = models.CharField(max_length=255)
     message = models.TextField()
@@ -61,10 +71,16 @@ class Notification(models.Model):
     
     def __str__(self):
         return self.title
+    
+    def __str__(self):
+        return self.title
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True)
+    image = models.ImageField(upload_to='category-image',blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
     image = models.ImageField(upload_to='category-image',blank=True, null=True)
     description = models.TextField(blank=True)
@@ -72,6 +88,7 @@ class Category(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -84,19 +101,24 @@ class Category(models.Model):
             self.slug = slug
         super().save(*args, **kwargs)
         
+        
     def __str__(self):
         return self.name
 
 class SubCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="subcategories")
     name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True) 
+    image = models.ImageField(upload_to='category-image',blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True) 
     image = models.ImageField(upload_to='category-image',blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -111,8 +133,10 @@ class SubCategory(models.Model):
 
     def __str__(self):
         return f"{self.category.name} > {self.name}"
+        return f"{self.category.name} > {self.name}"
 
 class Banner(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     image_url = models.URLField()
@@ -123,5 +147,7 @@ class Banner(models.Model):
 
     is_active = models.BooleanField(default=True)
     
+    def __str__(self):
+        return self.title
     def __str__(self):
         return self.title
