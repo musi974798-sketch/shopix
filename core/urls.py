@@ -10,8 +10,8 @@ urlpatterns = [
     path('verify-otp/', views.verify_otp, name='verify_otp'),
     path('logout/',views.logout_view,name='logout'),
     path('',views.home_view,name='home'),
-    path('product/<uuid:id>/', views.single_variant_view, name='single_fetch'),
-    path('products/', views.products, name='products'),
+    path('product/<int:id>/', views.single_variant_view, name='single_fetch'),
+    path('core_product/', views.core_product, name='core_product'),
     # path('search/', views.search_view, name='search'),
 
 ]

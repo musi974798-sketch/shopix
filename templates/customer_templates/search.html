@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<style>
+    /* Hide scrollbar for clean UI but keep functionality */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Smooth image zoom on hover */
+    .img-zoom-hover:hover img { transform: scale(1.08); }
+</style>
+
+<div class="bg-[#f8f8f8] min-h-screen pb-20">
+    <div class="bg-white border-b border-gray-200 py-8 shadow-sm">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <nav class="flex text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
+                        <a href="{% url 'dashboard' %}" class="hover:text-[#A04747] transition-colors">Home</a>
+                        <span class="mx-2">/</span>
+                        <span class="text-[#343131]">Search Results</span>
+                    </nav>
+                    <h1 class="text-2xl md:text-3xl font-black text-[#343131] tracking-tight">
+                        Results for <span class="text-[#A04747] italic">"{{ search|default:'All Collection' }}"</span>
+                    </h1>
+                    <p class="text-sm text-gray-500 font-medium mt-1">Showing {{ products.count }} exclusive items</p>
+                </div>
+
+                <button id="mobile-filter-btn" class="lg:hidden flex items-center justify-center gap-2 w-full sm:w-auto bg-[#343131] text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg active:scale-95 transition-all">
+                    <span class="material-icons-round text-[18px]">tune</span>
+                    Filter & Sort
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+            
+            <div id="filter-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+            
+            <aside id="filter-sidebar" class="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white shadow-2xl transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:static lg:block lg:w-72 lg:flex-shrink-0 lg:bg-transparent lg:shadow-none lg:z-0 lg:h-auto overflow-y-auto lg:overflow-visible">
+                
+                <div class="p-6 lg:p-0 lg:sticky lg:top-28 h-full flex flex-col">
+                    <div class="flex items-center justify-between lg:hidden mb-6 pb-4 border-b border-gray-100">
+                        <h2 class="text-lg font-black text-[#343131] uppercase tracking-widest">Filters</h2>
+                        <button id="close-filter-btn" type="button" class="text-gray-400 hover:text-red-500 transition-colors p-2">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+
+                    <form id="filter-form" method="GET" action="{% url 'search' %}" class="flex-grow space-y-8">
+                        <input type="hidden" name="search" value="{{ search }}">
+
+                        <div class="space-y-4">
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#A04747]">Sort Options</h3>
+                            <div class="relative">
+                                <select name="sort" onchange="this.form.submit()" class="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-3 text-sm font-bold text-[#343131] appearance-none cursor-pointer focus:ring-0 focus:border-[#D8A25E] transition-colors shadow-sm">
+                                    <option value="" {% if not sort %}selected{% endif %}>Recommended</option>
+                                    <option value="new" {% if sort == 'new' %}selected{% endif %}>New Arrivals First</option>
+                                    <option value="low" {% if sort == 'low' %}selected{% endif %}>Price: Low to High</option>
+                                    <option value="high" {% if sort == 'high' %}selected{% endif %}>Price: High to Low</option>
+                                </select>
+                                <span class="material-icons-round absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-200">
+
+                        <div class="space-y-4">
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#A04747]">Designer Brands</h3>
+                            <div class="space-y-3 max-h-64 overflow-y-auto pr-2 no-scrollbar">
+                                {% for brand_name in all_brands %}
+                                <label class="flex items-center group cursor-pointer">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="checkbox" name="brand" value="{{ brand_name }}" 
+                                            {% if brand_name in selected_brands %}checked{% endif %}
+                                            class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-gray-300 checked:bg-[#343131] checked:border-[#343131] transition-all"
+                                            onchange="this.form.submit()">
+                                        <span class="material-icons-round absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none text-[16px]">check</span>
+                                    </div>
+                                    <span class="ml-3 text-sm font-bold text-gray-600 group-hover:text-[#343131] transition-colors select-none">{{ brand_name }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-200">
+
+                        <div class="space-y-4 pb-8 lg:pb-0">
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#A04747]">Price Range</h3>
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-full">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">₹</span>
+                                    <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}"
+                                        class="w-full bg-white border-2 border-gray-100 rounded-xl pl-8 pr-3 py-2.5 text-sm font-bold focus:border-[#D8A25E] outline-none transition-colors shadow-sm">
+                                </div>
+                                <span class="text-gray-400 font-bold">-</span>
+                                <div class="relative w-full">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">₹</span>
+                                    <input type="number" name="max_price" placeholder="Max" value="{{ max_price }}"
+                                        class="w-full bg-white border-2 border-gray-100 rounded-xl pl-8 pr-3 py-2.5 text-sm font-bold focus:border-[#D8A25E] outline-none transition-colors shadow-sm">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-white border-2 border-[#343131] text-[#343131] py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#343131] hover:text-white transition-colors">
+                                Apply Price
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-8 border-t border-gray-200 pt-6">
+                        <a href="{% url 'search' %}?search={{ search }}" class="flex items-center justify-center gap-2 text-xs font-bold text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest">
+                            <span class="material-icons-round text-[16px]">restart_alt</span>
+                            Clear All Filters
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1 w-full">
+                
+                {% if products %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+                    {% for product in products %}
+                    <div class="bg-white rounded-[2rem] p-4 hover:shadow-2xl transition-all duration-500 group relative border border-gray-100 hover:border-gray-200 img-zoom-hover flex flex-col h-full">
+                        
+                        <div class="absolute top-6 left-6 z-10 flex flex-col gap-2">
+                            {% if forloop.counter <= 3 and sort == 'new' %}
+                                <span class="bg-[#D8A25E] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">New</span>
+                            {% endif %}
+                        </div>
+                        <div class="absolute top-6 right-6 z-10">
+                            <button type="button" class="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white hover:scale-110 transition-all duration-300">
+                                <span class="material-icons-round text-[20px]">favorite_border</span>
+                            </button>
+                        </div>
+
+                        <a href="{% url 'single_fetch' product.variants.first.id %}" class="block relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#f4f4f4] mb-5">
+                            {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover transition-transform duration-700 ease-out">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center">
+                                <span class="material-icons-round text-6xl text-gray-200">image_not_supported</span>
+                            </div>
+                            {% endif %}
+                        </a>
+
+                        <div class="flex flex-col flex-grow">
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#A04747] mb-1.5">{{ product.brand }}</p>
+                            <a href="{% url 'single_fetch' product.variants.first.id %}" class="group-hover:text-[#A04747] transition-colors">
+                                <h3 class="text-lg font-bold text-[#343131] leading-tight line-clamp-2 mb-4">{{ product.name }}</h3>
+                            </a>
+                            
+                            <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+                                <div>
+                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Price</p>
+                                    <p class="text-xl font-black text-[#343131]">₹{{ product.variants.first.selling_price }}</p>
+                                </div>
+                                <a href="{% url 'single_fetch' product.variants.first.id %}" 
+                                   class="w-12 h-12 bg-[#f4f4f4] text-[#343131] rounded-xl flex items-center justify-center group-hover:bg-[#343131] group-hover:text-white transition-all duration-300">
+                                    <span class="material-icons-round">arrow_forward</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="flex flex-col items-center justify-center py-24 px-4 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                        <span class="material-icons-round text-5xl text-gray-300">search_off</span>
+                    </div>
+                    <h2 class="text-3xl font-black text-[#343131] mb-2 tracking-tight">Nothing found</h2>
+                    <p class="text-gray-500 max-w-md mx-auto mb-8 font-medium">We couldn't find anything matching your current filters. Try adjusting your search criteria or clearing filters to see more.</p>
+                    <a href="{% url 'search' %}" class="bg-[#343131] hover:bg-black text-white px-8 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors shadow-lg shadow-black/20">
+                        Explore All Products
+                    </a>
+                </div>
+                {% endif %}
+                
+            </main>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+        const closeFilterBtn = document.getElementById('close-filter-btn');
+        const filterSidebar = document.getElementById('filter-sidebar');
+        const filterOverlay = document.getElementById('filter-overlay');
+
+        function openFilters() {
+            filterSidebar.classList.remove('-translate-x-full');
+            filterOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                filterOverlay.classList.remove('opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeFilters() {
+            filterSidebar.classList.add('-translate-x-full');
+            filterOverlay.classList.add('opacity-0');
+            setTimeout(() => {
+                filterOverlay.classList.add('hidden');
+            }, 300); 
+            document.body.style.overflow = '';
+        }
+
+        if(mobileFilterBtn) mobileFilterBtn.addEventListener('click', openFilters);
+        if(closeFilterBtn) closeFilterBtn.addEventListener('click', closeFilters);
+        if(filterOverlay) filterOverlay.addEventListener('click', closeFilters);
+
+        // Price input auto-submit debounce
+        let timer;
+        const priceInputs = document.querySelectorAll('input[name="min_price"], input[name="max_price"]');
+        priceInputs.forEach(input => {
+            input.addEventListener('keyup', () => {
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    if(input.value.length > 0) {
+                        document.getElementById('filter-form').submit();
+                    }
+                }, 1200);
+            });
+        });
+    });
+</script>
+{% endblock %}

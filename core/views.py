@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
+from django.conf import settings
 from customer.models import *
 from .models import *
 
@@ -187,6 +188,27 @@ def home_view(request):
     
     return render(request, 'core_templates/homepage.html', context)
 
+# def home_view(request):
+#     products = ProductVariant.objects.filter(
+#         product__approval_status='APPROVED',
+#         product__is_active=True
+#     ).select_related('product').prefetch_related('images')
+
+#     user_wishlist_ids = [] 
+
+#     if request.user.is_authenticated:
+#         user_wishlist_ids = WishlistItem.objects.filter(
+#             wishlist__user=request.user
+#         ).values_list('variant_id', flat=True)
+
+#     context = {
+#         'products': products,
+#         'user_wishlist_ids': list(user_wishlist_ids),
+#     }
+    
+#     return render(request, 'core_templates/homepage.html', context)
+
+
 
 def single_variant_view(request, id):
     """Render HTML for a single product variant."""
@@ -202,7 +224,7 @@ def single_variant_view(request, id):
 
 
 
-def products(request):
+def core_product(request):
     """View to display products page with New Arrivals section and All Products section"""
     from django.db.models import Count
     
@@ -214,7 +236,7 @@ def products(request):
     base_qs = ProductVariant.objects.filter(
         product__approval_status='APPROVED',
         product__is_active=True
-    ).select_related('product', 'product__subcategory__category').prefetch_related('images')
+    ).select_related('product', 'product__subcategory__category').prefetch_related('product__images')
     
     # Apply category filter
     if category_id:
@@ -266,7 +288,7 @@ def products(request):
     if request.user.is_authenticated:
         context['data'] = request.user
     
-    return render(request, 'core_templates/products.html', context)
+    return render(request, 'core_templates/core_product.html', context)
 
 
 

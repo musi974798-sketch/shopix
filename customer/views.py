@@ -1,3 +1,5 @@
+from datetime import timedelta, timezone
+
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import *
 from django.contrib.auth.decorators import login_required
@@ -7,7 +9,13 @@ from seller.models import *
 from core .models import *
 from decimal import Decimal
 import uuid
+from django.db.models import Q
 
+#from django.contrib.auth import logout
+#from datetime import timedelta
+#rom django.utils import timezone
+#rom django.db.models import Q
+#from django.http import JsonResponse
 
 
 
@@ -130,11 +138,28 @@ def variant_page(request, id):
     variant = get_object_or_404(
         ProductVariant.objects.select_related('product__seller').prefetch_related(
             'product__images',
-            'images'
+            'product__reviews'
         ),
         id=id
     )
-    return render(request, 'customer_templates/single_fetch.html', {'variant': variant})
+    
+    product = variant.product
+    reviews = product.reviews.all().select_related('user').order_by('-created_at')
+    
+    if reviews.exists():
+        avg_rating = sum(review.rating for review in reviews) / reviews.count()
+        avg_rating = round(avg_rating, 1)
+    else:
+        avg_rating = None
+    
+    context = {
+        'variant': variant,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+        'review_count': reviews.count()
+    }
+    
+    return render(request, 'customer_templates/single_fetch.html', context)
 
 
 
@@ -441,3 +466,132 @@ def order_confirmation(request,order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     order_item=OrderItem.objects.filter(order=order)
     return render(request,"customer_templates/order_confirmation.html",{"order":order,"order_item":order_item})
+
+
+def order_history(request):
+    orders = Order.objects.filter(user=request.user).prefetch_related('items').order_by('-ordered_at')
+
+    filter_type = request.GET.get("filter")
+    if filter_type == "2months":
+        three_month_ago = timezone.now() - timedelta(days=60)
+        orders = orders.filter(ordered_at__gte=three_month_ago)
+
+    return render(request,"customer_templates/order_history.html",{"orders":orders})
+
+
+
+def search(request):
+    search=request.GET.get("search")
+
+    brand=request.GET.getlist('brand')
+    min_price = request.GET.get("min_price")
+    max_price = request.GET.get("max_price")
+    sort = request.GET.get("sort")
+
+    products = Product.objects.filter(is_active=True, variants__isnull=False).distinct()
+    if search:
+        words=search.split()
+        q_object=Q() 
+
+        for searchs in words:
+            q_object |= Q(name__icontains=searchs)
+            q_object |= Q(brand__icontains=searchs)
+            q_object |= Q(subcategory__name__icontains=searchs)
+            q_object |= Q(subcategory__category__name__icontains=searchs)
+            q_object |= Q(model_number__icontains=searchs)
+        products=products.filter(q_object).distinct()
+
+    if brand:
+        products=products.filter(brand__in=brand)
+
+    if min_price and min_price.isdigit():
+        products=products.filter(variants__selling_price__gte=int(min_price))
+
+    if max_price and max_price.isdigit():
+        products=products.filter(variants__selling_price__lte=int(max_price))
+
+    if sort == "low":
+        products = products.order_by("variants__selling_price")
+
+    elif sort == "high":
+        products = products.order_by("-variants__selling_price")
+
+    elif sort == "new":
+        products = products.order_by("-created_at")
+
+    all_brands = Product.objects.filter(is_active=True, variants__isnull=False).values_list("brand", flat=True).distinct()
+
+    return render(request,"customer_templates/search.html",{"products":products,
+                                                            "search":search,
+                                                            'all_brands': all_brands,
+                                                            'selected_brands': brand,
+                                                            'min_price': min_price,
+                                                            'max_price': max_price,
+                                                            "sort":sort})
+def variant_page(request, id):
+    # Removed product__reviews from prefetch as it causes conflicts with our custom query
+    variant = get_object_or_404(
+        ProductVariant.objects.select_related('product__seller').prefetch_related(
+            'product__images'
+        ),
+        id=id
+    )
+    
+    product = variant.product
+    # Fetch reviews safely
+    reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
+    
+    if reviews.exists():
+        avg_rating = sum(review.rating for review in reviews) / reviews.count()
+        avg_rating = round(avg_rating, 1)
+    else:
+        avg_rating = None
+    
+    context = {
+        'variant': variant,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+        'review_count': reviews.count()
+    }
+    
+    return render(request, 'customer_templates/single_fetch.html', context)
+
+
+@login_required(login_url='login')
+def add_review(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id)
+        
+        # 1. Get the data
+        rating_str = request.POST.get('rating')
+        comment = request.POST.get('comment')
+
+        # 2. Safety check: Ensure they aren't empty
+        if not rating_str or not comment:
+            messages.error(request, "Please provide both a rating and a comment.")
+            return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+
+        # 3. CRITICAL: Convert the string rating to an Integer!
+        try:
+            rating = int(rating_str)
+        except ValueError:
+            messages.error(request, "Invalid rating submitted.")
+            return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+
+        # 4. Check if user already reviewed this product
+        if Review.objects.filter(user=request.user, product=product).exists():
+            messages.error(request, "You have already reviewed this product.")
+            return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+
+        # 5. Save the review!
+        Review.objects.create(
+            product=product,
+            user=request.user,
+            rating=rating,
+            comment=comment
+        )
+        
+        messages.success(request, "Thank you! Your review has been submitted.")
+        return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+        
+    return redirect('home')

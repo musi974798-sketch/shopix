@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopix | Explore Products</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+<main class="max-w-7xl mx-auto w-full px-4 py-8 flex gap-8">
+
+    <aside class="w-64 hidden md:block sticky top-24 h-fit">
+
+        <div class="bg-white rounded-xl shadow-sm border p-5">
+            <h3 class="font-bold text-lg mb-4">Categories</h3>
+
+            <ul class="space-y-2 text-sm">
+
+                <li>
+                    <a href="?sort={{ sort_filter }}"
+                       class="flex justify-between {% if not category_filter %}text-red-500 font-semibold{% else %}text-gray-600{% endif %}">
+                        All Products
+                    </a>
+                </li>
+
+                {% for category in categories %}
+                <li>
+                    <a href="?category_id={{ category.id }}&sort={{ sort_filter }}"
+                       class="flex justify-between items-center hover:text-red-500 transition
+                       {% if category_filter == category.id|stringformat:'s' %}text-red-500 font-semibold{% else %}text-gray-600{% endif %}">
+                        
+                        <span>{{ category.name }}</span>
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
+                            {{ category.product_count }}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+
+    </aside>
+
+    <div class="flex-1 space-y-8">
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900">
+                    Discover Products
+                </h1>
+                <p class="text-gray-500 text-sm mt-1">
+                    {{ total_products }} items available
+                </p>
+            </div>
+
+            <form method="GET" id="sortForm" class="flex items-center gap-2">
+
+                {% if category_filter %}
+                    <input type="hidden" name="category_id" value="{{ category_filter }}">
+                {% endif %}
+
+                <select name="sort"
+                        onchange="this.form.submit()"
+                        class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 outline-none">
+
+                    <option value="newest" {% if sort_filter == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="oldest" {% if sort_filter == 'oldest' %}selected{% endif %}>Oldest</option>
+                    <option value="price_asc" {% if sort_filter == 'price_asc' %}selected{% endif %}>Price ↑</option>
+                    <option value="price_desc" {% if sort_filter == 'price_desc' %}selected{% endif %}>Price ↓</option>
+                    <option value="name_asc" {% if sort_filter == 'name_asc' %}selected{% endif %}>A → Z</option>
+                    <option value="name_desc" {% if sort_filter == 'name_desc' %}selected{% endif %}>Z → A</option>
+
+                </select>
+            </form>
+        </div>
+
+        {% if new_arrivals %}
+        <section>
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
+                <span class="material-icons">fiber_new</span>
+                New Arrivals
+            </h2>
+
+            <div class="flex gap-4 overflow-x-auto pb-4">
+                {% for variant in new_arrivals %}
+                    {% include 'core_templates/components/product_card.html' %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {% for variant in all_products %}
+            <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition p-4 group">
+
+                <a href="{% url 'variant_page' variant.id %}" class="block overflow-hidden rounded-lg">
+                    {% with first_image=variant.product.images.all.0 %}
+                        {% if first_image %}
+                            <img src="{{ first_image.image.url }}"
+                                 alt="{{ variant.product.name }}"
+                                 class="w-full h-52 object-cover group-hover:scale-105 transition duration-300">
+                        {% else %}
+                            <div class="w-full h-52 bg-gray-100 flex items-center justify-center">
+                                <span class="material-icons text-gray-300 text-4xl">image</span>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </a>
+
+                <div class="mt-4 space-y-1">
+                    <p class="text-xs text-gray-400 uppercase">
+                        {{ variant.product.brand }}
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 truncate">
+                        {{ variant.product.name }}
+                    </h3>
+
+                    <p class="text-lg font-bold text-red-500">
+                        ₹{{ variant.selling_price }}
+                    </p>
+                </div>
+
+                <div class="flex justify-between items-center mt-4">
+
+                    <a href="{% url 'add_to_wishlist' variant.id %}"
+                       class="p-2 rounded-full border transition
+                       {% if user_wishlist_ids and variant.id in user_wishlist_ids %}
+                           text-red-500 border-red-500
+                       {% else %}
+                           text-gray-400 hover:text-red-500
+                       {% endif %}">
+                        <span class="material-icons-round">favorite</span>
+                    </a>
+
+                    <a href="{% url 'add_to_cart' variant.id %}"
+                       class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition">
+                        Add to Cart
+                    </a>
+
+                </div>
+            </div>
+
+            {% empty %}
+            <div class="col-span-full text-center py-16 bg-white rounded-xl shadow-sm">
+
+                <span class="material-icons text-6xl text-gray-300">
+                    search_off
+                </span>
+
+                <h3 class="text-xl font-semibold mt-4">
+                    No products found
+                </h3>
+
+                <p class="text-gray-500 mt-2">
+                    Try different filters or categories
+                </p>
+            </div>
+            {% endfor %}
+
+        </section>
+
+    </div>
+
+</main>
+
+</body>
+</html>
