@@ -5,7 +5,9 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
+from core.adapter import get_redirect_by_role
 from customer.models import *
+from pro1 import settings
 from .models import *
 
 from seller.models import *
@@ -15,36 +17,28 @@ from django.core.mail import send_mail
 User = get_user_model()
 
 def login_view(request):
+    show_google_login = True 
+
     if request.method == "POST":
-        email = request.POST.get('email')
+        identifier = request.POST.get('login') 
         password = request.POST.get('password')
 
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, username=identifier, password=password)
 
         if user is not None:
+            if user.is_superuser and "@" in identifier:
+                messages.error(request, "Admins must login using their username, not email.")
+                return redirect('login')
+
             login(request, user)
-
-            # ✅ Print logged-in user info
-            print(f"User logged in: {user.email} | Role: {user.role}")
-
-            if user.role == 'SELLER':
-                print("Logged in as SELLER")
-                return redirect('sellerhome')
-
-            elif user.role == 'CUSTOMER':
-                print("Logged in as CUSTOMER")
-                return redirect('home')
-
-            elif user.role == 'ADMIN':
-                print("Logged in as ADMIN")
-                return redirect('admin_dashboard')
-
+            return redirect(get_redirect_by_role(user))
+        
         else:
-            print("Login failed for:", email)
-            messages.error(request, 'Invalid email or password. Please try again.')
+            messages.error(request, 'Invalid credentials. Please try again.')
 
-    return render(request, 'core_templates/loginpage.html')
-
+    return render(request, 'core_templates/loginpage.html', {
+        'show_google_login': show_google_login
+    })
 
 def customer_register(request):
     if request.method == "POST":

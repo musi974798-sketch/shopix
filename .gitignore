@@ -14,6 +14,7 @@ env/
 *.pyc
 db.sqlite3
 media/
+.env
 
 # Static files
 

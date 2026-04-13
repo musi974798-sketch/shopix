@@ -1,0 +1,67 @@
+    {% load static %}
+    
+    <aside
+        class="fixed left-0 top-0 h-full w-64 bg-gray-50 dark:bg-gray-950 flex flex-col p-4 border-r border-gray-200 dark:border-gray-800 z-50">
+        <div class="mb-10 px-2">
+            <div class="h-16 flex items-center justify-start">
+                <img src="{% static 'images/shopix_admin.png' %}" alt="Shopix Logo" class="h-12 w-auto object-contain">
+            </div>
+            <p class="text-xs uppercase tracking-wider text-gray-400 mt-2 pl-4"><b>Admin Overview</b></p>
+        </div>
+
+        <nav class="flex-1 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-amber-700 dark:text-amber-400 font-bold transition-all duration-200"
+                href="{% url 'admindashboard' %}">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="text-sm font-semibold">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                href="{% url 'customerlisting' %}">
+                <span class="material-symbols-outlined" data-icon="group">group</span>
+                <span class="text-sm font-semibold">Registered Customers</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                href="{% url 'sellerlisting' %}">
+                <span class="material-symbols-outlined" data-icon="group">group</span>
+                <span class="text-sm font-semibold">Registered Sellers</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                href="{% url 'productlisting' %}">
+                <span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                <span class="text-sm font-semibold">Registered Products</span>
+            </a>
+            <!-- <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                <span class="text-sm font-semibold">Orders</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+                <span class="text-sm font-semibold">Analytics</span>
+            </a> -->
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                <span class="text-sm font-semibold">Settings</span>
+            </a>
+        </nav>
+
+        <div class="mt-auto pt-4">
+            <button
+                class="w-full mb-4 text-amber-700 dark:text-amber-400 border border-amber-700/20 font-bold py-3 rounded-md hover:bg-amber-50 transition-all text-sm">
+                Export Report
+            </button>
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 transition-all"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="help">help</span>
+                <span class="text-sm font-semibold">Help Center</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 transition-all"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                <span class="text-sm font-semibold">Sign Out</span>
+            </a>
+        </div>
+    </aside>

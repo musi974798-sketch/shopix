@@ -10,7 +10,6 @@ from django.utils.text import slugify
 # =========================
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ROLE_CHOICES = (
         ('ADMIN', 'Admin'),
         ('SELLER', 'Seller'),
@@ -31,7 +30,6 @@ class User(AbstractUser):
         return self.username
 
 class Address(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
     full_name = models.CharField(max_length=100)
@@ -59,7 +57,6 @@ class Address(models.Model):
 # =========================
 class Notification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     title = models.CharField(max_length=255)
     message = models.TextField()
@@ -71,12 +68,8 @@ class Notification(models.Model):
     
     def __str__(self):
         return self.title
-    
-    def __str__(self):
-        return self.title
 
 class Category(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -107,7 +100,6 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="subcategories")
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True) 
@@ -133,10 +125,8 @@ class SubCategory(models.Model):
 
     def __str__(self):
         return f"{self.category.name} > {self.name}"
-        return f"{self.category.name} > {self.name}"
 
 class Banner(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     image_url = models.URLField()
