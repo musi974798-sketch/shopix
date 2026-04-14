@@ -10,6 +10,8 @@ from core .models import *
 from decimal import Decimal
 import uuid
 from django.db.models import Q
+import razorpay
+from django.conf import settings
 
 #from django.contrib.auth import logout
 #from datetime import timedelta
@@ -381,45 +383,45 @@ def order_select_address(request, address_id):
     return redirect('order')
 
 
-
 @login_required
 def place_order(request):
-    user=request.user
-    if request.method !="POST":
+    user = request.user
+
+    if request.method != "POST":
         return redirect("home")
-    
-    variant_id=request.POST.get("variant_id")
-    cart_id=request.POST.get("cart_id")
-    payment_method=request.POST.get("payment_method")
-    
-    address=Address.objects.filter(user=user, is_default=True).first()
+
+    variant_id = request.POST.get("variant_id")
+    cart_id = request.POST.get("cart_id")
+    payment_method = request.POST.get("payment_method")
+
+    address = Address.objects.filter(user=user, is_default=True).first()
 
     if not address:
-        messages.error(request,"Please Add a Delivery Address.")
-        return redirect("customer_add_address")
-    
-    order_number="ORD-" + uuid.uuid4().hex[:10].upper()
-    
-  
+        messages.error(request, "Please Add a Delivery Address.")
+        return redirect("customer_address")
+
+    order_number = "ORD-" + uuid.uuid4().hex[:10].upper()
+
+    # ================= CART CHECKOUT =================
     if cart_id:
         cart = get_object_or_404(Cart, id=cart_id, user=user)
         cart_items = CartItem.objects.filter(cart=cart)
-        
+
         if not cart_items.exists():
-            messages.error(request,"Your cart is empty.")
+            messages.error(request, "Your cart is empty.")
             return redirect("cart")
-        
+
         total_amount = sum(item.price_at_time * item.quantity for item in cart_items)
-        
-       
-        order=Order.objects.create(
+
+        order = Order.objects.create(
             user=user,
             order_number=order_number,
             total_amount=total_amount,
             payment_method=payment_method,
-            address=address
+            address=address,
+            payment_status="PENDING"
         )
-        
+
         for item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -428,38 +430,67 @@ def place_order(request):
                 quantity=item.quantity,
                 price_at_purchase=item.price_at_time
             )
-        #cart_delete
+
+        # clear cart
         cart_items.delete()
         cart.total_amount = 0
         cart.save()
-        
-        messages.success(request,f"ORDER Placed Successfully! Order Number: {order_number}")
+
+    # ================= SINGLE PRODUCT =================
+    else:
+        if not variant_id:
+            messages.error(request, "Invalid order request.")
+            return redirect("home")
+
+        variant = get_object_or_404(ProductVariant, id=variant_id)
+
+        order = Order.objects.create(
+            user=user,
+            order_number=order_number,
+            total_amount=variant.selling_price,
+            payment_method=payment_method,
+            address=address,
+            payment_status="PENDING"
+        )
+
+        OrderItem.objects.create(
+            order=order,
+            variant=variant,
+            seller=variant.product.seller,
+            quantity=1,
+            price_at_purchase=variant.selling_price
+        )
+
+    # ================= PAYMENT HANDLING =================
+
+    # 🟢 COD
+    if payment_method == "COD":
+        messages.success(request, f"Order placed successfully! Order Number: {order_number}")
         return redirect("order_confirmation", order_id=order.id)
-    
 
-    if not variant_id:
-        messages.error(request,"Invalid order request.")
-        return redirect("customer_home")
-    
-    variant=get_object_or_404(ProductVariant, id=variant_id)
-    
-    order=Order.objects.create(
-        user=user,
-        order_number=order_number,
-        total_amount=variant.selling_price,
-        payment_method=payment_method,
-        address=address
-    )
-    OrderItem.objects.create(
-        order=order,
-        variant=variant,
-        seller=variant.product.seller,
-        quantity=1,
-        price_at_purchase=variant.selling_price
-    )
-    messages.success(request,f"ORDER Placed SuccessFully! Order Number: {order_number}")
-    return redirect("order_confirmation", order_id=order.id)
+    # 🔵 RAZORPAY
+    elif payment_method == "CARD":
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
+        razorpay_order = client.order.create({
+            "amount": int(order.total_amount * 100),  # paise
+            "currency": "INR",
+            "payment_capture": 1
+        })
+
+        order.razorpay_order_id = razorpay_order["id"]
+        order.save()
+
+        return render(request, "customer_templates/razorpay_payment.html", {
+            "order": order,
+            "razorpay_order_id": razorpay_order["id"],
+            "razorpay_key": settings.RAZORPAY_KEY_ID,
+            "amount": int(order.total_amount * 100),
+        })
+
+    return redirect("home")
+
+  
 
 @login_required
 def order_confirmation(request,order_id):
@@ -595,3 +626,4 @@ def add_review(request, product_id):
         return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
         
     return redirect('home')
+

@@ -1,0 +1,97 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="bg-[#f1f3f6] min-h-screen py-8 font-sans">
+    <div class="container mx-auto px-4 max-w-5xl">
+
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-slate-900 uppercase">Order Status</h1>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+            <!-- LEFT -->
+            <div class="w-full lg:flex-grow space-y-4">
+
+                <!-- SUCCESS BOX -->
+                <div class="bg-white rounded shadow border overflow-hidden">
+
+                    <div class="px-6 py-3 bg-green-600">
+                        <h2 class="text-white text-sm font-bold uppercase">
+                            Order Placed Successfully
+                        </h2>
+                    </div>
+
+                    <div class="p-6 flex items-center gap-6 border-b">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                            ✅
+                        </div>
+
+                        <div>
+                            <h2 class="text-lg font-bold">
+                                Thank you, {{ user.username|title }}!
+                            </h2>
+                            <p class="text-sm text-gray-500">
+                                Your order has been confirmed.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ORDER DETAILS -->
+                    {% if order %}
+                    <div class="p-6 grid grid-cols-2 gap-4 bg-gray-50">
+
+                        <div class="bg-white p-4 border rounded">
+                            <p class="text-xs text-gray-400">Order ID</p>
+                            <p class="font-bold">#{{ order.order_number }}</p>
+                        </div>
+
+                        <div class="bg-white p-4 border rounded">
+                            <p class="text-xs text-gray-400">Payment Method</p>
+                            <p class="font-bold">{{ order.payment_method }}</p>
+                        </div>
+
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="flex gap-4">
+                    <a href="{% url 'home' %}"
+                       class="flex-1 bg-orange-500 text-white py-3 text-center rounded font-bold">
+                        Continue Shopping
+                    </a>
+
+                    <a href="{% url 'customer_orders' %}"
+                       class="flex-1 bg-white border py-3 text-center rounded font-bold">
+                        View Orders
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            {% if order %}
+            <aside class="w-full lg:w-[350px]">
+                <div class="bg-white border rounded shadow">
+
+                    <div class="p-4 border-b">
+                        <h2 class="text-sm font-bold text-gray-500">Order Summary</h2>
+                    </div>
+
+                    <div class="p-4 space-y-3">
+                        <div class="flex justify-between">
+                            <span>Total</span>
+                            <span class="font-bold">₹{{ order.total_amount }}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

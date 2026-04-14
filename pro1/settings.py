@@ -185,3 +185,11 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # --- Default Auto Field ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# -----------------------------
+# Razorpay Configuration
+# -----------------------------
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "rzp_test_ScGDvA2v65vV7y")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "JoAFet9IKTCDfUEJHoXyiEG7")
