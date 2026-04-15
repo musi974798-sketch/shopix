@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('customer_profile/', views.profile_view, name='profile'),
-    path('dashboard/', views.dashboard_view, name='dashboard'),
+    
     path('cart/', views.cart_view, name='cart'),
     
     # Cart Actions
@@ -40,6 +40,9 @@ urlpatterns = [
     
     # Process the order (POST request)
     path('place_order/', views.place_order, name='place_order'),
+    
+    # Payment success callback
+    path('payment-success/', views.payment_success, name='payment_success'),
     
     # Success/Confirmation page
     path('order_confirmation/<uuid:order_id>/', views.order_confirmation, name='order_confirmation'),

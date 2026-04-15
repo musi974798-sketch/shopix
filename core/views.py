@@ -5,8 +5,9 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
-from django.conf import settings
+from core.adapter import get_redirect_by_role
 from customer.models import *
+from pro1 import settings
 from .models import *
 
 from seller.models import *
@@ -16,29 +17,28 @@ from django.core.mail import send_mail
 User = get_user_model()
 
 def login_view(request):
+    show_google_login = True 
+
     if request.method == "POST":
-        email = request.POST.get('email')
+        identifier = request.POST.get('login') 
         password = request.POST.get('password')
 
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, username=identifier, password=password)
 
         if user is not None:
+            if user.is_superuser and "@" in identifier:
+                messages.error(request, "Admins must login using their username, not email.")
+                return redirect('login')
+
             login(request, user)
-
-            if user.role == 'SELLER':
-                return redirect('sellerhome')
-
-            elif user.role == 'CUSTOMER':
-                return redirect('home')
-
-            elif user.role == 'ADMIN':
-                return redirect('admin_dashboard')
-
+            return redirect(get_redirect_by_role(user))
+        
         else:
-            messages.error(request, 'Invalid email or password. Please try again.')
+            messages.error(request, 'Invalid credentials. Please try again.')
 
-    return render(request, 'core_templates/loginpage.html')
-
+    return render(request, 'core_templates/loginpage.html', {
+        'show_google_login': show_google_login
+    })
 
 def customer_register(request):
     if request.method == "POST":
@@ -173,17 +173,23 @@ def logout_view(request):
 
 
 def home_view(request):
-    products = ProductVariant.objects.all()
+    # Optimized Query: Fetch variants with their associated products and images in a single/few queries
+    products = ProductVariant.objects.select_related(
+        'product', 'product__subcategory'
+    ).prefetch_related(
+        'product__images'
+    ).filter(product__is_active=True).order_by('-created_at')[:20] # Limiting to 20 for homepage performance
+
     user_wishlist_ids = [] 
 
     if request.user.is_authenticated:
-        user_wishlist_ids = WishlistItem.objects.filter(
+        user_wishlist_ids = list(WishlistItem.objects.filter(
             wishlist__user=request.user
-        ).values_list('variant_id', flat=True)
+        ).values_list('variant_id', flat=True))
 
     context = {
         'products': products,
-        'user_wishlist_ids': list(user_wishlist_ids),
+        'user_wishlist_ids': user_wishlist_ids,
     }
     
     return render(request, 'core_templates/homepage.html', context)

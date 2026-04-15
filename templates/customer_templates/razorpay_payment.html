@@ -1,30 +1,163 @@
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | Razorpay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        
+        /* Razorpay Brand Colors */
+        .bg-razorpay { background-color: #3395FF; }
+        .hover-bg-razorpay:hover { background-color: #2b7ce6; }
+        .text-razorpay { color: #3395FF; }
+        
+        /* Custom Scrollbar for items list */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-8">
 
-<script>
-var options = {
-    "key": "{{ razorpay_key }}",
-    "amount": "{{ amount }}",
-    "currency": "INR",
-    "name": "Shopix",
-    "description": "Order Payment",
-    "order_id": "{{ razorpay_order_id }}",
+    <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row ring-1 ring-gray-900/5">
+        
+        <div class="w-full md:w-5/12 bg-gray-50 p-8 lg:p-10 border-r border-gray-200 flex flex-col h-full">
+            
+            <div class="mb-8">
+                <img src="https://razorpay.com/assets/razorpay-glyph.svg" class="h-8 mb-6 drop-shadow-sm" alt="Razorpay Logo">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Order Summary</h3>
+                <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">#{{ payment.razorpay_order_id }}</h1>
+            </div>
 
-    "handler": function (response){
-        fetch("/verify-payment/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
+            <div class="flex-grow overflow-y-auto custom-scrollbar pr-2 mb-6 max-h-[40vh] md:max-h-[300px]">
+                <div class="space-y-5">
+                    {% for item in items %}
+                    <div class="flex items-center gap-4 group">
+                        <div class="h-16 w-16 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover:border-blue-300 transition-colors relative">
+                            {% with item.variant.images.all as imgs %}
+                                {% for img in imgs %}
+                                    {% if img.is_primary %}
+                                        <img src="{{ img.image_url }}" class="w-full h-full object-cover" alt="product">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                            <span class="absolute -top-1 -right-1 bg-gray-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center z-10">{{ item.quantity }}</span>
+                        </div>
+
+                        <div class="flex-1">
+                            <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">{{ item.variant.product.name }}</h4>
+                            <p class="text-xs font-medium text-gray-500 mt-1">₹{{ item.price_at_purchase }} each</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-200 mt-auto">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-medium text-gray-500">Subtotal</span>
+                    <span class="text-sm font-semibold text-gray-900">₹{{ amount_rupees }}</span>
+                </div>
+                <div class="flex justify-between items-end mt-4">
+                    <span class="text-base font-bold text-gray-900">Total Amount</span>
+                    <span class="text-2xl font-extrabold text-razorpay">₹{{ amount_rupees }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full md:w-7/12 p-8 lg:p-12 flex flex-col justify-center bg-white relative">
+            
+            <div class="max-w-md mx-auto w-full">
+                <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full mb-8 shadow-sm">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                    </span>
+                    <span class="text-xs font-bold text-blue-700 uppercase tracking-wide">Ready for Payment</span>
+                </div>
+
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">Complete your order</h2>
+                <p class="text-gray-500 text-sm mb-10 leading-relaxed font-medium">
+                    You're almost there! Click the button below to open the secure Razorpay gateway. You can pay via UPI, Credit/Debit Cards, or Netbanking.
+                </p>
+
+                <button id="pay-btn" class="relative w-full bg-razorpay hover-bg-razorpay text-white py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 shadow-[0_8px_20px_-6px_rgba(51,149,255,0.5)] hover:shadow-[0_12px_25px_-6px_rgba(51,149,255,0.6)] hover:-translate-y-0.5 flex items-center justify-center gap-3 group overflow-hidden">
+                    <span id="btn-text">Pay ₹{{ amount_rupees }}</span>
+                    <svg id="btn-icon" class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    <svg id="btn-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+
+                <div class="mt-12">
+                    <p class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wider mb-6">Supported Payment Methods</p>
+                    <div class="flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo.png" alt="UPI" class="h-5 object-contain">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg" alt="Visa" class="h-4 object-contain">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-7 object-contain">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Rupay-Logo.png" alt="RuPay" class="h-5 object-contain">
+                    </div>
+                </div>
+
+                <div class="mt-10 flex flex-col items-center justify-center bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <div class="flex items-center gap-2 text-[11px] font-bold text-gray-600 uppercase tracking-widest">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        128-bit SSL Secure Checkout
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1.5 font-medium">PCI DSS Compliant • We do not store your card details</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ key }}",
+            "amount": "{{ payment.amount }}",
+            "currency": "INR",
+            "order_id": "{{ payment.razorpay_order_id }}",
+            
+            // Handle modal closure
+            "modal": {
+                "ondismiss": function(){
+                    // Reset button state if user closes modal without paying
+                    document.getElementById('btn-text').textContent = 'Pay ₹{{ amount_rupees }}';
+                    document.getElementById('btn-icon').classList.remove('hidden');
+                    document.getElementById('btn-spinner').classList.add('hidden');
+                    document.getElementById('pay-btn').classList.remove('opacity-90', 'cursor-not-allowed');
+                }
             },
-            body: JSON.stringify(response)
-        })
-        .then(res => res.json())
-        .then(data => {
-            window.location.href = data.redirect_url;
-        });
-    }
-};
 
-var rzp = new Razorpay(options);
-rzp.open();
-</script>
+            "handler": function (response){
+                // Redirect with payment details on success
+                window.location.href = "/payment-success/?payment_id=" + response.razorpay_payment_id +
+                                       "&order_id=" + response.razorpay_order_id +
+                                       "&signature=" + response.razorpay_signature;
+            }
+        };
+
+        var rzp = new Razorpay(options);
+
+        document.getElementById('pay-btn').onclick = function(e){
+            // Show loading state on button click
+            const btn = document.getElementById('pay-btn');
+            document.getElementById('btn-text').textContent = 'Opening Secure Gateway...';
+            document.getElementById('btn-icon').classList.add('hidden');
+            document.getElementById('btn-spinner').classList.remove('hidden');
+            btn.classList.add('opacity-90', 'cursor-not-allowed');
+
+            // Open Razorpay Modal
+            rzp.open();
+        }
+    </script>
+</body>
+</html>

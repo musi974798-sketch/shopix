@@ -12,7 +12,7 @@ import uuid
 from django.db.models import Q
 import razorpay
 from django.conf import settings
-
+from core.decorators import customer_required
 #from django.contrib.auth import logout
 #from datetime import timedelta
 #rom django.utils import timezone
@@ -29,7 +29,7 @@ User = get_user_model()
 #     products = Product.objects.all()
 #     return render(request, 'core_templates/homepage.html', { 'products' : products })
 
-
+@customer_required
 @login_required(login_url='login')
 def profile_view(request):
     user = request.user
@@ -75,13 +75,9 @@ def profile_view(request):
     return render(request, 'customer_templates/profilepage.html', {'user': user})
 
 
-def dashboard_view(request):
-    products = Product.objects.all()
-    return render(request, 'customer_templates/coustomer_dashboard.html', {
-        'products': products
-    })
-    
 
+    
+@customer_required
 @login_required
 def cart_view(request):
 
@@ -95,6 +91,7 @@ def cart_view(request):
         'total_amount': total_amount
     })
 
+@customer_required
 @login_required
 def add_cart(request,variant_id):
     user=request.user
@@ -108,7 +105,7 @@ def add_cart(request,variant_id):
         return redirect('home')
     return redirect('home')
 
-
+@customer_required
 @login_required
 def cart_update_quantity(request, item_id, action):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
@@ -126,7 +123,7 @@ def cart_update_quantity(request, item_id, action):
             
     return redirect('cart')
 
-
+@customer_required
 @login_required
 def cart_remove_item(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
@@ -165,7 +162,7 @@ def variant_page(request, id):
 
 
 
-
+@customer_required
 @login_required
 def add_to_wishlist(request, variant_id):
     if not request.user.is_authenticated:
@@ -190,7 +187,7 @@ def add_to_wishlist(request, variant_id):
 
     return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
 
-
+@customer_required
 @login_required
 def wishlist_view(request):
     wishlist = Wishlist.objects.filter(user=request.user).first()
@@ -200,6 +197,8 @@ def wishlist_view(request):
 
     return render(request, 'customer_templates/wishlist.html', {'wishlist_items': wishlist_items})
 
+
+@customer_required
 @login_required
 def remove_from_wishlist(request, wishlist_item_id):
     """Deletes a specific wishlist entry"""
@@ -212,6 +211,7 @@ def remove_from_wishlist(request, wishlist_item_id):
     return redirect('wishlist_view')
 
 
+@customer_required
 @login_required 
 def clear_wishlist(request):
     """Deletes all items from the user's wishlist without deleting the wishlist itself"""
@@ -221,12 +221,14 @@ def clear_wishlist(request):
     messages.success(request, "Wishlist cleared successfully.")
     return redirect('wishlist_view')
 
-
+@customer_required
 @login_required 
 def customer_address(request):
     address= Address.objects.filter(user=request.user)
     return render(request,'customer_templates/customer_address.html',{'address':address})
 
+
+@customer_required
 @login_required 
 def customer_address_add(request):
     if request.method=="POST":
@@ -259,6 +261,7 @@ def customer_address_add(request):
     return render(request,'customer_templates/customer_address_add.html')
 
 
+@customer_required
 @login_required 
 def customer_address_update(request,address_id):
     address = Address.objects.get(id=address_id, user=request.user)
@@ -295,7 +298,7 @@ def customer_address_update(request,address_id):
 
 
 
-
+@customer_required
 @login_required
 def customer_address_delete(request, address_id):
     address = Address.objects.get(id=address_id, user=request.user)
@@ -320,11 +323,11 @@ def customer_address_delete(request, address_id):
 
 
 
-
+@customer_required
 @login_required
 def order(request, id):
     product = get_object_or_404(Product, id=id)
-    product_variant = ProductVariant.objects.get(product=product)
+    product_variant = ProductVariant.objects.filter(product=product).first()
     
     addresses = Address.objects.filter(user=request.user).order_by('-is_default', '-updated_at')
     
@@ -482,13 +485,50 @@ def place_order(request):
         order.save()
 
         return render(request, "customer_templates/razorpay_payment.html", {
-            "order": order,
-            "razorpay_order_id": razorpay_order["id"],
-            "razorpay_key": settings.RAZORPAY_KEY_ID,
-            "amount": int(order.total_amount * 100),
+            "payment": order,
+            "key": settings.RAZORPAY_KEY_ID,
+            "amount_rupees": order.total_amount,
+            "items": order.items.all(),
         })
 
     return redirect("home")
+
+  
+
+@login_required
+def payment_success(request):
+    payment_id = request.GET.get('payment_id')
+    order_id = request.GET.get('order_id')
+    signature = request.GET.get('signature')
+
+    if not all([payment_id, order_id, signature]):
+        messages.error(request, "Invalid payment response.")
+        return redirect("home")
+
+    # Verify the payment signature
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    params_dict = {
+        'razorpay_order_id': order_id,
+        'razorpay_payment_id': payment_id,
+        'razorpay_signature': signature
+    }
+
+    try:
+        client.utility.verify_payment_signature(params_dict)
+        # Signature is valid, update order status
+        order = get_object_or_404(Order, razorpay_order_id=order_id, user=request.user)
+        order.payment_status = 'COMPLETED'
+        order.razorpay_payment_id = payment_id
+        order.save()
+        messages.success(request, f"Payment successful! Order Number: {order.order_number}")
+        return redirect("order_confirmation", order_id=order.id)
+    except razorpay.errors.SignatureVerificationError:
+        # Signature verification failed
+        order = get_object_or_404(Order, razorpay_order_id=order_id, user=request.user)
+        order.payment_status = 'FAILED'
+        order.save()
+        messages.error(request, "Payment verification failed. Please contact support.")
+        return redirect("home")
 
   
 

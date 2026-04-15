@@ -57,6 +57,8 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_status = models.CharField(max_length=20, default='PENDING')
     payment_method = models.CharField(max_length=50, blank=True, null=True)
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
     address = models.ForeignKey("core.Address", on_delete=models.SET_NULL, null=True, blank=True)
     order_status = models.CharField(max_length=20, default='PLACED')
     ordered_at = models.DateTimeField(auto_now_add=True)

@@ -1,86 +1,317 @@
 {% extends 'base.html' %}
 
+{% block title %}Order Confirmed - {{ order.order_number }}{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    
-    <div class="text-center mb-10">
-        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-            <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-        </div>
-        <h1 class="text-3xl font-extrabold text-gray-900">Order Confirmed!</h1>
-        <p class="mt-2 text-lg text-gray-600">Thank you for your purchase. Your order number is <strong>{{ order.order_number }}</strong>.</p>
-    </div>
+<div id="confetti-container" class="fixed inset-0 pointer-events-none z-50"></div>
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-        <div class="px-4 py-5 sm:px-6 flex justify-between items-center bg-gray-50 border-b border-gray-200">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Order Information</h3>
-            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                Processing
-            </span>
-        </div>
-        
-        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
-            <dl class="sm:divide-y sm:divide-gray-200">
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Date Placed</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ order.created_at|date:"F j, Y, g:i a" }}</dd>
-                </div>
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Total Amount</dt>
-                    <dd class="mt-1 text-sm font-bold text-gray-900 sm:mt-0 sm:col-span-2">₹{{ order.total_amount }}</dd>
-                </div>
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Payment Method</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ order.payment_method }}</dd>
-                </div>
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Shipping Address</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        <p>{{ order.address.full_name }}</p>
-                        <p>{{ order.address.street_address }}</p>
-                        <p>{{ order.address.city }}, {{ order.address.state }} {{ order.address.postal_code }}</p>
-                        <p>Phone: {{ order.address.phone_number }}</p>
-                    </dd>
-                </div>
-            </dl>
-        </div>
-    </div>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
 
-    <h2 class="text-xl font-bold text-gray-900 mb-4">Items in your order</h2>
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <ul role="list" class="divide-y divide-gray-200">
-            {% for item in order_item %}
-            <li class="p-4 sm:px-6 flex items-center py-5">
-                {% if item.variant.product.image %}
-                    <img src="{{ item.variant.product.image.url }}" alt="{{ item.variant.product.name }}" class="h-16 w-16 rounded-md object-cover border border-gray-200">
-                {% else %}
-                    <div class="h-16 w-16 rounded-md bg-gray-200 flex items-center justify-center text-gray-500 text-xs border border-gray-200">No Img</div>
-                {% endif %}
-                
-                <div class="ml-6 flex-1">
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-sm font-medium text-gray-900">{{ item.variant.product.name }}</h4>
-                        <p class="text-sm font-medium text-gray-900">₹{{ item.price_at_purchase }}</p>
+        <!-- Success Animation Section -->
+        <div class="text-center mb-12 animate-fade-in">
+            <div class="relative mx-auto mb-8">
+                <div id="success-circle" class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-500 shadow-2xl transform scale-0 transition-all duration-1000">
+                    <svg class="h-12 w-12 text-white animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <div class="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-20"></div>
+            </div>
+
+            <h1 class="text-4xl font-bold text-gray-900 mb-4 animate-slide-up">Order Confirmed!</h1>
+            <p class="text-xl text-gray-600 mb-2">Thank you for your purchase</p>
+            <div class="inline-flex items-center bg-white rounded-lg px-4 py-2 shadow-md">
+                <span class="text-sm text-gray-500 mr-2">Order #</span>
+                <span id="order-number" class="font-mono font-bold text-gray-900">{{ order.order_number }}</span>
+                <button onclick="copyOrderNumber()" class="ml-2 text-blue-500 hover:text-blue-700 transition-colors">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Status Timeline -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 animate-slide-up-delayed">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Order Status</h3>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
                     </div>
-                    <div class="mt-1 flex items-center justify-between">
-                        <p class="text-sm text-gray-500">Qty: {{ item.quantity }}</p>
-                        <p class="text-sm text-gray-500">Seller: {{ item.seller.name|default:"Retailer" }}</p>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900">Order Placed</p>
+                        <p class="text-xs text-gray-500">{{ order.created_at|date:"M j, Y g:i A" }}</p>
                     </div>
                 </div>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
 
-    <div class="mt-10 flex space-x-4 justify-center">
-        <a href="{% url 'home' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition">
-            Continue Shopping
-        </a>
-        <a href="{% url 'customer_orders' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition">
-            View My Orders
-        </a>
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
+                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900">Processing</p>
+                        <p class="text-xs text-gray-500">Estimated: 1-2 business days</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Shipped</p>
+                        <p class="text-xs text-gray-400">Pending</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Delivered</p>
+                        <p class="text-xs text-gray-400">Pending</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Order Details -->
+            <div class="bg-white rounded-xl shadow-lg p-6 animate-slide-up-delayed">
+                <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Order Details
+                </h3>
+
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Order Date</span>
+                        <span class="font-medium">{{ order.created_at|date:"F j, Y" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Total Amount</span>
+                        <span class="font-bold text-lg text-green-600">₹{{ order.total_amount }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Payment Method</span>
+                        <span class="font-medium">{{ order.payment_method }}</span>
+                    </div>
+                    <div class="py-2">
+                        <span class="text-gray-600 block mb-2">Shipping Address</span>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="font-medium">{{ order.address.full_name }}</p>
+                            <p class="text-sm text-gray-600">{{ order.address.street_address }}</p>
+                            <p class="text-sm text-gray-600">{{ order.address.city }}, {{ order.address.state }} {{ order.address.postal_code }}</p>
+                            <p class="text-sm text-gray-600">Phone: {{ order.address.phone_number }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="bg-white rounded-xl shadow-lg p-6 animate-slide-up-delayed">
+                <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    Order Items
+                </h3>
+
+                <div class="space-y-4">
+                    {% for item in order_item %}
+                    <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        {% if item.variant.product.image %}
+                            <img src="{{ item.variant.product.image.url }}" alt="{{ item.variant.product.name }}"
+                                 class="w-16 h-16 object-cover rounded-lg border border-gray-200">
+                        {% else %}
+                            <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        {% endif %}
+
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">{{ item.variant.product.name }}</h4>
+                            <p class="text-sm text-gray-600">Quantity: {{ item.quantity }}</p>
+                            <p class="text-sm text-gray-600">Seller: {{ item.seller.name|default:"Retailer" }}</p>
+                        </div>
+
+                        <div class="text-right">
+                            <p class="font-bold text-gray-900">₹{{ item.price_at_purchase }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-12 text-center animate-fade-in-delayed">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'home' %}"
+                   class="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    Continue Shopping
+                </a>
+
+                <a href="{% url 'order_history' %}"
+                   class="inline-flex items-center px-8 py-4 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    View My Orders
+                </a>
+
+                <button onclick="printOrder()"
+                        class="inline-flex items-center px-8 py-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print Order
+                </button>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-12 bg-blue-50 rounded-xl p-6 animate-fade-in-delayed">
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Need Help?</h3>
+                <p class="text-gray-600 mb-4">If you have any questions about your order, feel free to contact our support team.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="mailto:support@example.com" class="text-blue-600 hover:text-blue-800 font-medium">
+                        Email Support
+                    </a>
+                    <span class="hidden sm:block text-gray-400">|</span>
+                    <a href="tel:+1234567890" class="text-blue-600 hover:text-blue-800 font-medium">
+                        Call Us: +1 (234) 567-890
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+// Confetti Animation
+function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    const colors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444'];
+
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'absolute w-2 h-2 animate-bounce';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+
+        container.appendChild(confetti);
+
+        setTimeout(() => {
+            confetti.remove();
+        }, 5000);
+    }
+}
+
+// Success Animation
+function showSuccessAnimation() {
+    const circle = document.getElementById('success-circle');
+    setTimeout(() => {
+        circle.classList.remove('scale-0');
+        circle.classList.add('scale-100');
+        createConfetti();
+    }, 500);
+}
+
+// Copy Order Number
+function copyOrderNumber() {
+    const orderNumber = document.getElementById('order-number').textContent;
+    navigator.clipboard.writeText(orderNumber).then(() => {
+        // Show temporary success message
+        const button = event.target;
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+        button.classList.add('text-green-500');
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('text-green-500');
+        }, 2000);
+    });
+}
+
+// Print Order
+function printOrder() {
+    window.print();
+}
+
+// Initialize animations
+document.addEventListener('DOMContentLoaded', function() {
+    showSuccessAnimation();
+});
+
+// Custom CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slide-up {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.8s ease-out forwards;
+    }
+
+    .animate-slide-up {
+        animation: slide-up 0.8s ease-out 0.2s forwards;
+        opacity: 0;
+    }
+
+    .animate-slide-up-delayed {
+        animation: slide-up 0.8s ease-out 0.4s forwards;
+        opacity: 0;
+    }
+
+    .animate-fade-in-delayed {
+        animation: fade-in 0.8s ease-out 0.6s forwards;
+        opacity: 0;
+    }
+
+    @media print {
+        .no-print { display: none !important; }
+        body { background: white !important; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
 {% endblock %}

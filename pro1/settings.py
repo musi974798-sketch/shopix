@@ -33,7 +33,7 @@ INSTALLED_APPS = [
 
     # Your Apps
     'admin_app',
-    'core',
+    'core.apps.CoreConfig',
     'customer',
     'seller',
 
@@ -62,6 +62,7 @@ MIDDLEWARE = [
     # Allauth Middleware
     'allauth.account.middleware.AccountMiddleware',
 ]
+
 
 ROOT_URLCONF = 'pro1.urls'
 
@@ -97,6 +98,11 @@ DATABASES = {
         'HOST': 'database-2.c5a0kwoqi37h.ap-southeast-2.rds.amazonaws.com',               
         'PORT': '3306',                   
     }
+
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 
