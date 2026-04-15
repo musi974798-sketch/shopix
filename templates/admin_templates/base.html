@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-surface text-on-surface">
+
+    <!-- ✅ Sidebar -->
+    <aside class="fixed left-0 top-0 h-full w-64 bg-gray-50 flex flex-col p-4 border-r">
+        <div class="mb-10 px-2">
+            <div class="h-16 flex items-center">
+                <img src="{% static 'images/shopix_admin.png' %}" class="h-12">
+            </div>
+            <p class="text-xs uppercase text-gray-400 mt-2 pl-4"><b>Admin Overview</b></p>
+        </div>
+
+        <nav class="flex-1 space-y-1">
+            <a href="{% url 'admindashboard' %}" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition
+   {% if request.resolver_match.url_name == 'admindashboard' %}
+       text-amber-700 bg-amber-100
+   {% else %}
+       text-gray-500 hover:bg-gray-100
+   {% endif %}">
+
+                <span class="material-symbols-outlined text-[18px]">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a href="{% url 'customerlisting' %}" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition
+   {% if request.resolver_match.url_name == 'customerlisting' %}
+       text-amber-700 bg-amber-100
+   {% else %}
+       text-gray-500 hover:bg-gray-100
+   {% endif %}">
+
+                <span class="material-symbols-outlined text-[18px]">group</span>
+                <span>Registered Customers</span>
+            </a>
+
+
+            <a href="{% url 'sellerlisting' %}" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition
+   {% if request.resolver_match.url_name == 'sellerlisting' %}
+       text-amber-700 bg-amber-100
+   {% else %}
+       text-gray-500 hover:bg-gray-100
+   {% endif %}">
+
+                <span class="material-symbols-outlined text-[18px]">store</span>
+                <span>Registered Sellers</span>
+            </a>
+
+
+            <a href="{% url 'productlisting' %}" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition
+   {% if request.resolver_match.url_name == 'productlisting' %}
+       text-amber-700 bg-amber-100
+   {% else %}
+       text-gray-500 hover:bg-gray-100
+   {% endif %}">
+
+                <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+                <span>Registered Products</span>
+            </a>
+
+
+            <a href="{% url 'adminsettings' %}" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-md transition
+   {% if request.resolver_match.url_name == 'adminsettings' %}
+       text-amber-700 bg-amber-100
+   {% else %}
+       text-gray-500 hover:bg-gray-100
+   {% endif %}">
+
+                <span class="material-symbols-outlined text-[18px]">settings</span>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="mt-auto">
+            <a href="{% url 'logout' %}" class="flex gap-3 px-4 py-3 text-gray-500">
+                <span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- ✅ Header -->
+    <header class="fixed top-0 right-0 w-[calc(100%-16rem)] bg-white h-16 flex items-center justify-between px-8">
+        <input type="text" placeholder="Search..." class="border px-4 py-2 rounded w-1/2">
+
+        <div>
+            <p class="text-sm font-bold">{{ user.email }}</p>
+        </div>
+    </header>
+
+    <!-- ✅ Main Content -->
+    <main class="ml-64 pt-20 px-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

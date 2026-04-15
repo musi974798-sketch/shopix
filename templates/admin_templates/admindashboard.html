@@ -1,481 +1,101 @@
-{% load static %}
-<!DOCTYPE html>
+{% extends 'admin_templates/base.html' %}
 
-<html class="light" lang="en">
+{% block content %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "surface-container-highest": "#e2e2e5",
-                        "surface": "#f9f9fc",
-                        "on-primary-fixed-variant": "#5b4300",
-                        "on-secondary-fixed": "#251a00",
-                        "primary-container": "#f2b90d",
-                        "on-surface": "#1a1c1e",
-                        "on-secondary-fixed-variant": "#59440b",
-                        "surface-tint": "#785a00",
-                        "primary-fixed-dim": "#f7be17",
-                        "error": "#ba1a1a",
-                        "background": "#f9f9fc",
-                        "primary": "#785a00",
-                        "surface-variant": "#e2e2e5",
-                        "outline": "#817660",
-                        "secondary-container": "#fddc95",
-                        "on-background": "#1a1c1e",
-                        "on-tertiary-container": "#00566f",
-                        "surface-container-low": "#f3f3f6",
-                        "on-tertiary-fixed-variant": "#004d64",
-                        "on-primary-container": "#654b00",
-                        "on-tertiary": "#ffffff",
-                        "on-secondary": "#ffffff",
-                        "outline-variant": "#d3c5ac",
-                        "surface-bright": "#f9f9fc",
-                        "tertiary-fixed-dim": "#66d3ff",
-                        "surface-container-high": "#e8e8ea",
-                        "on-primary-fixed": "#251a00",
-                        "on-error-container": "#93000a",
-                        "surface-dim": "#dadadc",
-                        "on-tertiary-fixed": "#001f2a",
-                        "tertiary": "#006684",
-                        "secondary": "#735b22",
-                        "inverse-primary": "#f7be17",
-                        "tertiary-fixed": "#bde9ff",
-                        "surface-container": "#eeeef0",
-                        "primary-fixed": "#ffdf9b",
-                        "error-container": "#ffdad6",
-                        "secondary-fixed-dim": "#e2c37f",
-                        "inverse-on-surface": "#f0f0f3",
-                        "tertiary-container": "#4ecfff",
-                        "on-secondary-container": "#775f26",
-                        "secondary-fixed": "#ffdf9b",
-                        "on-surface-variant": "#4f4633",
-                        "surface-container-lowest": "#ffffff",
-                        "on-primary": "#ffffff",
-                        "on-error": "#ffffff",
-                        "inverse-surface": "#2f3133"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                    "fontFamily": {
-                        "headline": ["Plus Jakarta Sans"],
-                        "body": ["Plus Jakarta Sans"],
-                        "label": ["Plus Jakarta Sans"]
-                    }
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+<!-- Dashboard Header -->
 
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+<div class="mb-10">
+    <h1 class="text-3xl font-extrabold tracking-tighter text-gray-900 mb-1">Admin Dashboard</h1>
+    <p class="text-gray-500 text-sm">Real-time performance metrics for Precision Curator.</p>
+</div>
 
-        .text-editorial-label {
-            font-size: 0.6875rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
+<!-- Bento Grid Layout -->
 
-        .tonal-nesting {
-            background-color: #f3f3f6;
-        }
-    </style>
-</head>
+<div class="grid grid-cols-12 gap-6">
 
-<body class="bg-surface text-on-surface">
-    <!-- SideNavBar Shell -->
-    <aside
-        class="fixed left-0 top-0 h-full w-64 bg-gray-50 dark:bg-gray-950 flex flex-col p-4 border-r border-gray-200 dark:border-gray-800 z-50">
-        <div class="mb-10 px-2">
-            <div class="h-16 flex items-center justify-start">
-                <img src="{% static 'images/shopix_admin.png' %}" alt="Shopix Logo" class="h-12 w-auto object-contain">
+
+    <!-- Total Revenue -->
+    <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-xl p-8">
+        <p class="text-xs text-gray-400 mb-2">Total Gross Revenue</p>
+        <h2 class="text-5xl font-black text-gray-900 mb-6">$1,284,592</h2>
+
+        <div class="flex items-center gap-4">
+            <div class="bg-yellow-100 px-3 py-1 rounded-full text-xs font-bold text-yellow-700">
+                +12.4%
             </div>
-            <p class="text-xs uppercase tracking-wider text-gray-400 mt-2 pl-4"><b>Admin Overview</b></p>
+            <p class="text-gray-400 text-xs">vs last 30 days</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+        <div class="bg-white rounded-xl p-6">
+            <p class="text-xs text-gray-400">Active Sellers</p>
+            <h3 class="text-3xl font-bold">4,290</h3>
         </div>
 
-        <nav class="flex-1 space-y-1">
-            <a class="flex items-center gap-3 px-4 py-3 text-amber-700 dark:text-amber-400 font-bold transition-all duration-200"
-                href="{% url 'admindashboard' %}">
-                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                <span class="text-sm font-semibold">Dashboard</span>
-            </a>
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                href="{% url 'customerlisting' %}">
-                <span class="material-symbols-outlined" data-icon="group">group</span>
-                <span class="text-sm font-semibold">Registered Customers</span>
-            </a>
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                href="{% url 'sellerlisting' %}">
-                <span class="material-symbols-outlined" data-icon="group">group</span>
-                <span class="text-sm font-semibold">Registered Sellers</span>
-            </a>
+        <div class="bg-white rounded-xl p-6">
+            <p class="text-xs text-gray-400">Total Buyers</p>
+            <h3 class="text-3xl font-bold">82,104</h3>
+        </div>
+    </div>
 
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                href="{% url 'productlisting' %}">
-                <span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
-                <span class="text-sm font-semibold">Registered Products</span>
-            </a>
-            <!-- <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
-                <span class="text-sm font-semibold">Orders</span>
-            </a>
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
-                <span class="text-sm font-semibold">Analytics</span>
-            </a> -->
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                <span class="text-sm font-semibold">Settings</span>
-            </a>
-        </nav>
+    <!-- Seller Table -->
+    <div class="col-span-12 lg:col-span-7 bg-white rounded-xl p-8">
+        <h3 class="text-lg font-bold mb-6">Top Performing Sellers</h3>
 
-        <div class="mt-auto pt-4">
-            <button
-                class="w-full mb-4 text-amber-700 dark:text-amber-400 border border-amber-700/20 font-bold py-3 rounded-md hover:bg-amber-50 transition-all text-sm">
-                Export Report
-            </button>
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 transition-all"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="help">help</span>
-                <span class="text-sm font-semibold">Help Center</span>
-            </a>
-            <a class="flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-gray-900 transition-all"
-                href="{% url 'logout' %}">
-                <span class="material-symbols-outlined" data-icon="logout">logout</span>
-                <span class="text-sm font-semibold">Sign Out</span>
-            </a>
-        </div>
-    </aside>
-    <!-- TopAppBar Shell -->
-    <header
-        class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-white/80 backdrop-blur-md h-16 flex items-center justify-between px-8">
-        <div class="flex items-center flex-1 max-w-xl">
-            <div class="relative w-full group">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400"
-                    data-icon="search">search</span>
-                <input
-                    class="w-full bg-surface-container-low border-none rounded-md pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary-container transition-all"
-                    placeholder="Search curated listings..." type="text" />
-            </div>
-        </div>
-        <div class="flex items-center gap-6 ml-8">
-            <div class="flex items-center gap-4">
-                <button class="p-2 text-gray-500 hover:bg-gray-100/50 rounded-full transition-colors">
-                    <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-                </button>
-                <button class="p-2 text-gray-400 hover:bg-gray-100/50 rounded-full transition-colors">
-                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                </button>
-            </div>
-            <div class="h-8 w-px bg-gray-200"></div>
-            <div class="flex items-center gap-3">
-                <div class="text-right">
-                    <p class="text-xs font-bold text-gray-900">{{ user.email }}</p>
-                    <p class="text-editorial-label text-gray-400">SHOPIX ADMIN</p>
-                </div>
-                <img alt="Administrator Profile"
-                    class="w-10 h-10 rounded-full object-cover grayscale hover:grayscale-0 transition-all"
-                    data-alt="Professional headshot of a person with a minimalist and high-end aesthetic"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQcYpw2Yo7S5kE17egEjhA69BxIhxGcXR_wpJ5UhpQ87qy5r_NmptoILrY4RAGQCOOS-4xIeq5NTJmzj08sgIrMUMBy8sBK5XJ8JZ5SWRNxI-4Snpt8ZnEFzsSjuibfZrGtzADgTypqWcS4ME-m53Uxp9h4jB36X2_-bKsnhtabHoQymcUvNkxy8rNpio5U34gNDxEYgdP4UzCtK8qcOFEQsWKyxvz4Sd0mzWSuuBfGcfs9nTLxETozL03rK8UStx5zyxlNQkH4keh" />
-            </div>
-        </div>
-    </header>
-    <!-- Main Content Canvas -->
-    <main class="ml-64 pt-24 px-8 pb-12 min-h-screen">
-        <!-- Dashboard Header -->
-        <div class="mb-10">
-            <h1 class="text-3xl font-extrabold tracking-tighter text-gray-900 mb-1">Admin Dashboard</h1>
-            <p class="text-gray-500 text-sm">Real-time performance metrics for Precision Curator.</p>
-        </div>
-        <!-- Bento Grid Layout -->
-        <div class="grid grid-cols-12 gap-6">
-            <!-- 1) Total Revenue Card -->
-            <div
-                class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-xl p-8 flex flex-col justify-between relative overflow-hidden group">
-                <div class="relative z-10">
-                    <p class="text-editorial-label text-gray-400 mb-2">Total Gross Revenue</p>
-                    <h2 class="text-5xl font-black tracking-tighter text-gray-900 mb-6">$1,284,592<span
-                            class="text-xl text-primary ml-2">.00</span></h2>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-1 bg-primary-container/20 px-3 py-1 rounded-full">
-                            <span class="material-symbols-outlined text-primary text-sm"
-                                data-icon="trending_up">trending_up</span>
-                            <span class="text-primary font-bold text-xs">+12.4%</span>
-                        </div>
-                        <p class="text-gray-400 text-xs">vs last 30 days</p>
-                    </div>
-                </div>
-                <!-- Abstract Trend Graph Representation -->
-                <div class="absolute bottom-0 right-0 left-0 h-32 opacity-20 group-hover:opacity-30 transition-opacity">
-                    <svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 100">
-                        <path d="M0 80 Q 250 10, 500 70 T 1000 30 L 1000 100 L 0 100 Z" fill="url(#amberGradient)">
-                        </path>
-                        <defs>
-                            <lineargradient id="amberGradient" x1="0%" x2="0%" y1="0%" y2="100%">
-                                <stop offset="0%" style="stop-color:#F2B90D;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#F2B90D;stop-opacity:0"></stop>
-                            </lineargradient>
-                        </defs>
-                    </svg>
-                </div>
-            </div>
-            <!-- Stats Column -->
-            <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
-                <!-- Seller Summary -->
-                <div class="bg-surface-container-lowest rounded-xl p-6 flex items-center justify-between">
-                    <div>
-                        <p class="text-editorial-label text-gray-400 mb-1">Active Sellers</p>
-                        <h3 class="text-3xl font-bold text-gray-900">4,290</h3>
-                    </div>
-                    <div class="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center">
-                        <span class="material-symbols-outlined text-gray-400" data-icon="storefront">storefront</span>
-                    </div>
-                </div>
-                <!-- Buyer Summary -->
-                <div class="bg-surface-container-lowest rounded-xl p-6 flex items-center justify-between">
-                    <div>
-                        <p class="text-editorial-label text-gray-400 mb-1">Total Buyers</p>
-                        <h3 class="text-3xl font-bold text-gray-900">82,104</h3>
-                    </div>
-                    <div class="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center">
-                        <span class="material-symbols-outlined text-gray-400" data-icon="person">person</span>
-                    </div>
-                </div>
-            </div>
-            <!-- 2) Seller Overview Table -->
-            <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest rounded-xl p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-lg font-bold text-gray-900">Top Performing Sellers</h3>
-                    <button class="text-editorial-label text-primary font-bold hover:underline">View All</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-editorial-label text-gray-400 border-b-0">
-                                <th class="pb-4 font-medium">Store Name</th>
-                                <th class="pb-4 font-medium">Category</th>
-                                <th class="pb-4 font-medium">Status</th>
-                                <th class="pb-4 font-medium text-right">Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            <tr class="group hover:bg-surface-container-low transition-colors">
-                                <td class="py-4 font-semibold text-sm">Velvet &amp; Vine</td>
-                                <td class="py-4 text-xs text-gray-500">Luxury Goods</td>
-                                <td class="py-4">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Active</span>
-                                </td>
-                                <td class="py-4 text-right font-bold text-sm">$42,900</td>
-                            </tr>
-                            <tr class="group hover:bg-surface-container-low transition-colors">
-                                <td class="py-4 font-semibold text-sm">Onyx Kitchen</td>
-                                <td class="py-4 text-xs text-gray-500">Homeware</td>
-                                <td class="py-4">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Active</span>
-                                </td>
-                                <td class="py-4 text-right font-bold text-sm">$31,220</td>
-                            </tr>
-                            <tr class="group hover:bg-surface-container-low transition-colors">
-                                <td class="py-4 font-semibold text-sm">Stellar Tech</td>
-                                <td class="py-4 text-xs text-gray-500">Electronics</td>
-                                <td class="py-4">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded uppercase">Reviewing</span>
-                                </td>
-                                <td class="py-4 text-right font-bold text-sm">$28,500</td>
-                            </tr>
-                            <tr class="group hover:bg-surface-container-low transition-colors">
-                                <td class="py-4 font-semibold text-sm">Nordic Knit</td>
-                                <td class="py-4 text-xs text-gray-500">Apparel</td>
-                                <td class="py-4">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Active</span>
-                                </td>
-                                <td class="py-4 text-right font-bold text-sm">$19,400</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- 3) Buyer Insights Activity -->
-            <div class="col-span-12 lg:col-span-5 bg-surface-container-lowest rounded-xl p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <h3 class="text-lg font-bold text-gray-900">Buyer Activity</h3>
-                    <span class="material-symbols-outlined text-gray-300" data-icon="more_horiz">more_horiz</span>
-                </div>
-                <div class="space-y-6">
-                    <div class="flex gap-4">
-                        <img alt="Buyer 1" class="w-10 h-10 rounded-full"
-                            data-alt="Portrait of a young woman with a clear and bright aesthetic for a buyer profile"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzE14G0GRVtFNHUEhjHN5Pdeb66mZLEiV2o0Sqvv637Gm3p2gdneh_BhYNidl--2lNhqriRdHdYzNkN6VBQGanhIbA623PjhVmM2Zs5l43Wi5ukotgIKMA_LkERRhts6whFOTd9yR3KNrYj2u6w5KtUBDHFXl2px4-gZTe-rlssC-rnehi-m7oqvlBjOLO7pXSZKMHnoHP6mjKt6_6xq5c9rtzLjgcBTr5pJMHdoVmndpicquIPGC7pc2D6V5dTD-XaEuRQ3FSSL-b" />
-                        <div class="flex-1">
-                            <p class="text-sm font-bold text-gray-900">Sarah Jenkins</p>
-                            <p class="text-xs text-gray-500">Purchased "Modern Oak Chair" from Velvet &amp; Vine</p>
-                            <p class="text-[10px] text-gray-400 mt-1">2 minutes ago</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div
-                            class="w-10 h-10 bg-primary-container/10 rounded-full flex items-center justify-center text-primary font-bold text-sm">
-                            JD</div>
-                        <div class="flex-1">
-                            <p class="text-sm font-bold text-gray-900">John Doe</p>
-                            <p class="text-xs text-gray-500">Left a 5-star review on "Onyx Espresso Machine"</p>
-                            <p class="text-[10px] text-gray-400 mt-1">15 minutes ago</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <img alt="Buyer 3" class="w-10 h-10 rounded-full"
-                            data-alt="Portrait of a smiling man used for customer profile visualization in a clean dashboard"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl2ZJUCHvPd0BpjUdO0PvchIon9tNcb4Zc0lSWCz_XTx-QQbpugzu90IWrlTqVPTU8zAUwvw2er24OC3aGEvFzZmhpGMKKHrEOwwnuHwVz42P7zqqJgyJbwes7Czle1TZz3t_qp-2FMoeBPt7XdDl6YOZHB9DRsQyliTJWvww6XgHR579HZslzl-lCt_ikYjLbwZjh33KwNAMvdTHGLSr-zzV0J7qeSb-f4bvqOZ1qJoD79_exPxEYrgX9aNpa0brgBLnBj5ER46Si" />
-                        <div class="flex-1">
-                            <p class="text-sm font-bold text-gray-900">Marcus Wright</p>
-                            <p class="text-xs text-gray-500">Joined the "Elite Membership" program</p>
-                            <p class="text-[10px] text-gray-400 mt-1">1 hour ago</p>
-                        </div>
-                    </div>
-                </div>
-                <button
-                    class="w-full mt-8 py-3 bg-gray-50 text-gray-600 font-bold text-xs rounded uppercase tracking-widest hover:bg-gray-100 transition-colors">See
-                    Recent Activity</button>
-            </div>
-            <!-- 4) Product Inventory Section -->
-            <div class="col-span-12 bg-surface-container-lowest rounded-xl p-8">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-900">Product Inventory</h3>
-                        <p class="text-xs text-gray-400">Manage your total stock of 18,342 products.</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button
-                            class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-xs font-bold rounded-md hover:bg-gray-50 transition-colors">
-                            <span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
-                            Filter
-                        </button>
-                        <button
-                            class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary-container text-xs font-bold rounded-md hover:opacity-90 transition-all">
-                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
-                            Add Product
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-editorial-label text-gray-400 border-b border-gray-50">
-                                <th class="pb-4 font-medium">SKU</th>
-                                <th class="pb-4 font-medium">Product Name</th>
-                                <th class="pb-4 font-medium">Category</th>
-                                <th class="pb-4 font-medium">Price</th>
-                                <th class="pb-4 font-medium">Stock</th>
-                                <th class="pb-4 font-medium">Status</th>
-                                <th class="pb-4 font-medium text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            <tr class="group hover:bg-gray-50/50">
-                                <td class="py-5 text-xs text-gray-400 font-mono">#P-9021</td>
-                                <td class="py-5 font-semibold text-sm">Eames Lounge Chair Rep.</td>
-                                <td class="py-5 text-xs text-gray-500">Furniture</td>
-                                <td class="py-5 font-bold text-sm">$899.00</td>
-                                <td class="py-5 text-sm">42</td>
-                                <td class="py-5">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">In
-                                        Stock</span>
-                                </td>
-                                <td class="py-5 text-right">
-                                    <button class="p-2 text-gray-300 hover:text-primary transition-colors">
-                                        <span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="group hover:bg-gray-50/50">
-                                <td class="py-5 text-xs text-gray-400 font-mono">#P-4412</td>
-                                <td class="py-5 font-semibold text-sm">Mechanical Keyboard v3</td>
-                                <td class="py-5 text-xs text-gray-500">Electronics</td>
-                                <td class="py-5 font-bold text-sm">$159.00</td>
-                                <td class="py-5 text-sm">118</td>
-                                <td class="py-5">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">In
-                                        Stock</span>
-                                </td>
-                                <td class="py-5 text-right">
-                                    <button class="p-2 text-gray-300 hover:text-primary transition-colors">
-                                        <span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="group hover:bg-gray-50/50">
-                                <td class="py-5 text-xs text-gray-400 font-mono">#P-1108</td>
-                                <td class="py-5 font-semibold text-sm">Leather Weekend Bag</td>
-                                <td class="py-5 text-xs text-gray-500">Travel</td>
-                                <td class="py-5 font-bold text-sm">$320.00</td>
-                                <td class="py-5 text-sm">0</td>
-                                <td class="py-5">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-red-100 text-red-700 text-[10px] font-bold rounded uppercase">Out
-                                        of Stock</span>
-                                </td>
-                                <td class="py-5 text-right">
-                                    <button class="p-2 text-gray-300 hover:text-primary transition-colors">
-                                        <span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="group hover:bg-gray-50/50">
-                                <td class="py-5 text-xs text-gray-400 font-mono">#P-3329</td>
-                                <td class="py-5 font-semibold text-sm">Ceramic Vase - Sand</td>
-                                <td class="py-5 text-xs text-gray-500">Home Decor</td>
-                                <td class="py-5 font-bold text-sm">$45.00</td>
-                                <td class="py-5 text-sm">8</td>
-                                <td class="py-5">
-                                    <span
-                                        class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded uppercase">Low
-                                        Stock</span>
-                                </td>
-                                <td class="py-5 text-right">
-                                    <button class="p-2 text-gray-300 hover:text-primary transition-colors">
-                                        <span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
-</body>
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-gray-400 text-xs">
+                    <th>Store</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th class="text-right">Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="py-3 font-semibold">Velvet & Vine</td>
+                    <td class="text-gray-500 text-sm">Luxury Goods</td>
+                    <td><span class="text-green-600 text-xs">Active</span></td>
+                    <td class="text-right">$42,900</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-</html>
+    <!-- Buyer Activity -->
+    <div class="col-span-12 lg:col-span-5 bg-white rounded-xl p-8">
+        <h3 class="text-lg font-bold mb-6">Buyer Activity</h3>
+
+        <p class="text-sm">Recent activities will appear here</p>
+    </div>
+
+    <!-- Product Inventory -->
+    <div class="col-span-12 bg-white rounded-xl p-8">
+        <h3 class="text-lg font-bold mb-6">Product Inventory</h3>
+
+        <table class="w-full">
+            <thead>
+                <tr class="text-xs text-gray-400">
+                    <th>SKU</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#P-9021</td>
+                    <td>Eames Chair</td>
+                    <td>$899</td>
+                    <td>42</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+
+</div>
+
+{% endblock %}

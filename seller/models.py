@@ -4,18 +4,35 @@ from django.utils.text import slugify
 
 
 # ================= SELLER =================
+from django.db import models
+from django.utils.text import slugify
+from core.models import User
+
 class SellerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="seller_profile")
+    
     store_name = models.CharField(max_length=255)
-    store_slug = models.SlugField(unique=True)
+    store_slug = models.SlugField(unique=True, blank=True)
+    business_address = models.TextField()
+    
     gst_number = models.CharField(max_length=50)
     pan_number = models.CharField(max_length=50)
     bank_account_number = models.CharField(max_length=50)
     ifsc_code = models.CharField(max_length=20)
-    business_address = models.TextField()
+    branch_name = models.CharField(max_length=100, null=True, blank=True)
+    
+    
+    document_1 = models.FileField(upload_to='seller_docs/business/', null=True, blank=True)
+    document_2 = models.FileField(upload_to='seller_docs/tax/', null=True, blank=True)
+    
     rating = models.FloatField(default=0)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.store_slug:
+            self.store_slug = slugify(self.store_name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.store_name

@@ -1,0 +1,54 @@
+{% extends 'admin_templates/base.html' %}
+
+{% block content %}
+
+<div class="mb-10">
+    <h1 class="text-3xl font-extrabold tracking-tighter text-gray-900 mb-1">
+        Shopix Settings
+    </h1>
+    <p class="text-gray-500 text-sm">
+        Manage platform configurations and admin preferences.
+    </p>
+</div>
+
+<!-- Example Settings UI -->
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 max-w-2xl">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Site Name -->
+        <div class="mb-5">
+            <label class="block text-sm font-semibold mb-1">Site Name</label>
+            <input type="text" name="site_name"
+                class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-amber-400 outline-none"
+                placeholder="Enter site name">
+        </div>
+
+        <!-- Contact Email -->
+        <div class="mb-5">
+            <label class="block text-sm font-semibold mb-1">Contact Email</label>
+            <input type="email" name="contact_email"
+                class="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-amber-400 outline-none"
+                placeholder="Enter contact email">
+        </div>
+
+        <!-- Toggle Example -->
+        <div class="mb-5 flex items-center justify-between">
+            <span class="text-sm font-semibold">Enable Maintenance Mode</span>
+            <input type="checkbox" name="maintenance" class="h-5 w-5">
+        </div>
+
+        <!-- Submit -->
+        <div class="mt-6">
+            <button type="submit"
+                class="bg-amber-500 text-white px-5 py-2 rounded-md font-semibold hover:bg-amber-600 transition">
+                Save Settings
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
