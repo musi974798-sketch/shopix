@@ -5,215 +5,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopix | Premium Online Shopping</title>
+    <title>Shopix | Amber & Black Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-        :root {
-            --brand-primary: #111827; /* Deep almost-black */
-            --brand-accent: #D8A25E; /* Gold */
-            --brand-danger: #ef4444; /* Red */
-        }
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f9fafb;
-            color: var(--brand-primary);
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #09090b;
         }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
+        .hover-underline {
+            position: relative;
         }
 
-        /* Smooth image mix-blend for white backgrounds */
-        .product-image {
-            mix-blend-mode: darken;
+        .hover-underline::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #f59e0b;
+            transition: width 0.3s ease;
+        }
+
+        .hover-underline:hover::after {
+            width: 100%;
         }
     </style>
 </head>
 
 <body class="flex flex-col min-h-screen">
-
-    <div class="bg-black text-white py-2 px-4 text-xs font-medium text-center tracking-wide">
-        🎉 Free Express Shipping on all orders over ₹5000! <a href="#" class="underline hover:text-[#D8A25E] ml-2">Shop Now</a>
-    </div>
-
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all">
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20 gap-4 md:gap-8">
-                
-                <a href="#" class="flex-shrink-0 flex items-center">
-                    <img src="{% static 'images/shopix_logo.jpeg' %}" alt="Shopix Logo" 
-                         class="h-10 sm:h-12 w-auto object-contain rounded">
+    <header class="w-full sticky top-0 bg-white/80 backdrop-blur-md border-b border-zinc-100 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex justify-between items-center gap-4 md:gap-8">
+            <div class="flex items-center gap-4 flex-shrink-0">
+                <a href="#" class="flex items-center gap-3 group">
+                    <img alt="Shopix Logo"
+                        class="h-8 w-8 sm:h-10 sm:w-10 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform"
+                        src="{% static 'images/shopix_logo.jpeg' %}" />
+                    <span class="text-lg sm:text-xl font-black tracking-tighter uppercase">Shopix</span>
                 </a>
+            </div>
 
-                <div class="hidden md:flex flex-1 max-w-2xl">
-                    <form action="{% url 'search' %}" method="GET" class="w-full relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span class="material-icons text-gray-400 group-focus-within:text-[#D8A25E] transition-colors">search</span>
-                        </div>
-                        <input type="text" name="search" placeholder="Search for products, brands..." required
-                            class="w-full pl-12 pr-4 py-3 bg-gray-100 border-transparent rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-[#D8A25E] focus:border-transparent transition-all outline-none" 
-                            value="{{ request.GET.search }}">
-                        <button type="submit" class="absolute inset-y-1 right-1 bg-black hover:bg-gray-800 text-white px-6 rounded-full text-sm font-medium transition-colors">
-                            Search
-                        </button>
-                    </form>
+            <div class="flex-1 max-w-xl hidden md:block">
+                <form action="#" method="GET" class="relative">
+                    <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">search</span>
+                    <input type="text" name="q" placeholder="Search for products..."
+                        class="w-full bg-zinc-100 border-none focus:ring-2 focus:ring-amber-500 px-12 py-2.5 rounded-full text-sm transition-all outline-none">
+                </form>
+            </div>
+
+            <div class="flex items-center gap-3 sm:gap-6">
+                <div class="hidden lg:flex gap-6 text-[11px] font-bold uppercase tracking-widest">
+                    <a href="#new-arrivals" class="hover-underline">New</a>
+                    <a href="#" class="hover-underline text-amber-600">Sale</a>
                 </div>
 
-                <div class="flex items-center gap-5 sm:gap-7">
-                    
-                    <button class="md:hidden text-gray-700 hover:text-black transition-colors">
-                        <span class="material-icons text-[28px]">search</span>
-                    </button>
-
+                <div class="flex items-center gap-3 sm:gap-4 border-l border-zinc-200 pl-3 sm:pl-6">
                     {% if user.is_authenticated %}
-                    <div class="relative group">
-                        <button class="flex flex-col items-center justify-center text-gray-700 hover:text-black transition-colors">
-                            <span class="material-icons text-[28px]">person_outline</span>
-                            <span class="text-[10px] font-semibold mt-1 hidden sm:block">Profile</span>
-                        </button>
-                        
-                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right border border-gray-100">
-                            <div class="p-4 border-b border-gray-50">
-                                <p class="text-xs text-gray-500 mb-1">Signed in as</p>
-                                <p class="text-sm font-bold text-gray-900 truncate">{{ user.username }}</p>
-                            </div>
-                            <div class="p-2 space-y-1">
-                                <a href="{% url 'profile' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">
-                                    <span class="material-icons text-gray-400 text-[20px]">manage_accounts</span> Account
-                                </a>
-                                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">
-                                    <span class="material-icons text-gray-400 text-[20px]">local_mall</span> Orders
-                                </a>
-                            </div>
-                            <div class="p-2 border-t border-gray-50">
-                                <a href="{% url 'logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 text-sm font-medium text-red-600 transition-colors">
-                                    <span class="material-icons text-[20px]">logout</span> Sign out
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <a href="{% url 'login' %}" class="hidden sm:flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-black transition-colors">
-                        <span class="material-icons text-[28px]">login</span>
-                        <span>Sign In</span>
+                    <a href="{% url 'profile' %}"
+                        class="text-[10px] sm:text-[11px] font-bold flex items-center gap-1 hover:text-amber-600 uppercase tracking-tighter">
+                        <span class="material-icons-round text-lg">account_circle</span>
+                        <span class="hidden sm:inline">{{ user.username }}</span>
                     </a>
+                    {% else %}
+                    <a href="{% url 'login' %}"
+                        class="text-[10px] sm:text-[11px] font-bold hover:text-amber-600 tracking-widest uppercase">Sign In</a>
                     {% endif %}
 
-                    <a href="{% url 'wishlist_view' %}" class="flex flex-col items-center justify-center text-gray-700 hover:text-red-500 transition-colors relative">
-                        <span class="material-icons text-[28px]">favorite_border</span>
-                        <span class="text-[10px] font-semibold mt-1 hidden sm:block">Wishlist</span>
-                    </a>
-
-                    <a href="{% url 'cart' %}" class="flex flex-col items-center justify-center text-gray-700 hover:text-black transition-colors relative">
-                        <div class="relative">
-                            <span class="material-icons text-[28px]">shopping_bag</span>
-                            <span class="absolute -top-1 -right-2 bg-[#D8A25E] text-black text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">0</span>
-                        </div>
-                        <span class="text-[10px] font-semibold mt-1 hidden sm:block">Cart</span>
+                    <a href="{% url 'cart' %}"
+                        class="relative bg-zinc-950 text-white p-2 sm:p-2.5 rounded-full hover:bg-amber-500 transition-colors">
+                        <span class="material-icons text-sm">shopping_bag</span>
+                        <span
+                            class="absolute -top-1 -right-1 bg-amber-500 text-zinc-950 text-[10px] font-black h-4 w-4 rounded-full flex items-center justify-center border-2 border-white">
+                            {{ cart_count|default:"0" }}
+                        </span>
                     </a>
                 </div>
             </div>
-        </div>
-
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-3">
-            <div class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
-                <a href="#" class="flex-shrink-0 px-4 py-1.5 bg-black text-white text-xs font-medium rounded-full shadow-sm hover:bg-gray-800 transition-colors">All Categories</a>
-                <a href="#" class="flex-shrink-0 px-4 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors">📱 Electronics</a>
-                <a href="#" class="flex-shrink-0 px-4 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors">👕 Fashion</a>
-                <a href="#" class="flex-shrink-0 px-4 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors">🏡 Home & Living</a>
-                <a href="#" class="flex-shrink-0 px-4 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors">👟 Footwear</a>
-                <a href="#" class="flex-shrink-0 px-4 py-1.5 bg-red-50 text-red-600 text-xs font-bold rounded-full hover:bg-red-100 transition-colors">🔥 Hot Deals</a>
-            </div>
-        </div>
+        </nav>
     </header>
 
-    <main class="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12 flex-grow">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full py-6 sm:py-8">
+        {% if user.is_authenticated %}
+        <section class="mb-16 sm:mb-20">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:bg-zinc-950 transition-all duration-300">
+                    <span class="material-icons-round text-amber-500 mb-3 group-hover:scale-110 transition-transform">dashboard</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">Dashboard</span>
+                </a>
+                <a href="{% url 'products' %}" class="group flex flex-col items-center justify-center p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:bg-zinc-950 transition-all duration-300">
+                    <span class="material-icons-round text-amber-500 mb-3 group-hover:scale-110 transition-transform">storefront</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">View Shop</span>
+                </a>
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:bg-zinc-950 transition-all duration-300">
+                    <span class="material-icons-round text-amber-500 mb-3 group-hover:scale-110 transition-transform">local_mall</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">Your Orders</span>
+                </a>
+                <a href="{% url 'profile' %}" class="group flex flex-col items-center justify-center p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:bg-zinc-950 transition-all duration-300">
+                    <span class="material-icons-round text-amber-500 mb-3 group-hover:scale-110 transition-transform">person</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">Profile</span>
+                </a>
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:bg-zinc-950 transition-all duration-300">
+                    <span class="material-icons-round text-amber-500 mb-3 group-hover:scale-110 transition-transform">place</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">Addresses</span>
+                </a>
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:bg-zinc-950 transition-all duration-300">
+                    <span class="material-icons-round text-amber-500 mb-3 group-hover:scale-110 transition-transform">settings</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">Settings</span>
+                </a>
+            </div>
+        </section>
+        {% endif %}
+        <section class="relative bg-zinc-950 rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden mb-12 sm:mb-16">
+            <div class="grid md:grid-cols-2 items-center">
+                <div class="p-8 sm:p-12 lg:p-20 z-10">
+                    <span class="text-amber-500 font-bold tracking-[0.3em] text-[9px] sm:text-[10px] uppercase mb-4 block">
+                        New Collection 2026
+                    </span>
+                    <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-[0.9] tracking-tighter mb-6">
+                        ESSENTIALS<br>FOR THE <span class="text-amber-500 italic">BOLD.</span>
+                    </h2>
+                    <p class="text-zinc-400 font-medium text-base sm:text-lg mb-8 max-w-sm">
+                        Curated craftsmanship meets modern design for the urban pioneer.
+                    </p>
+                    <a href="#"
+                        class="inline-block bg-amber-500 text-zinc-950 px-8 sm:px-10 py-3 sm:py-4 rounded-full font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-white transition-all shadow-xl">
+                        Shop Collection
+                    </a>
+                </div>
+                <div class="hidden md:block h-full min-h-[500px] relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent z-10">
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&q=80"
+                        alt="Modern Urban Fashion" class="object-cover h-full w-full opacity-90">
+                </div>
+            </div>
+        </section>
+
         
-        <div class="w-full h-[300px] md:h-[450px] rounded-3xl bg-[#111827] flex items-center justify-between px-8 md:px-20 overflow-hidden relative shadow-2xl">
-            <div class="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
-                <div class="w-[600px] h-[600px] bg-[#D8A25E] rounded-full blur-3xl absolute -top-20 -right-20"></div>
-            </div>
 
-            <div class="relative z-10 text-white max-w-xl">
-                <span class="inline-block px-3 py-1 bg-white/10 backdrop-blur border border-white/20 rounded-full text-xs font-bold tracking-widest text-[#D8A25E] uppercase mb-4">New Season Arrival</span>
-                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-[1.1]">Elevate Your Everyday Style.</h1>
-                <p class="text-gray-300 text-base md:text-lg mb-8 font-light">Discover the latest trends in fashion and cutting-edge electronics. Premium quality, delivered fast.</p>
-                <div class="flex gap-4">
-                    <a href="#" class="bg-white text-black px-8 py-3.5 rounded-full font-bold hover:bg-gray-100 transition-transform hover:scale-105 shadow-lg">Shop Collection</a>
-                </div>
-            </div>
-        </div>
-
-        <section>
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <section id="new-arrivals" class="scroll-mt-24">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-12">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Trending Now</h2>
-                    <p class="text-gray-500 mt-1 text-sm">Top picks for you based on current trends.</p>
+                    <h3 class="text-2xl sm:text-3xl font-black text-zinc-950 uppercase tracking-tighter">New Arrivals</h3>
+                    <p class="text-zinc-500 text-xs sm:text-sm font-medium">The latest drops, updated weekly.</p>
                 </div>
-                <a href="#" class="text-sm font-semibold text-black border-b border-black hover:text-[#D8A25E] hover:border-[#D8A25E] transition-colors pb-0.5 self-start md:self-auto">View All Products</a>
+                <a href="#"
+                    class="group flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-widest hover:text-amber-600 transition-colors">
+                    View All <span
+                        class="material-icons text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </a>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
-                
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                 {% for variant in products %}
-                <div class="group bg-white rounded-2xl flex flex-col overflow-hidden border border-gray-100 hover:border-transparent hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 transform hover:-translate-y-1 relative">
-                    
-                    <div class="absolute top-3 left-3 right-3 z-10 flex justify-between items-start pointer-events-none">
-                        <div>
-                            {% if variant.stock <= 0 %}
-                                <span class="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">Sold Out</span>
-                            {% elif forloop.counter <= 2 %} <span class="bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">New</span>
+                <div class="group">
+                    <div class="relative aspect-[3/4] bg-zinc-100 rounded-2xl sm:rounded-3xl overflow-hidden mb-4 transition-all duration-500">
+                        <span class="absolute top-4 left-4 z-10 bg-white text-zinc-950 text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">
+                            Limited
+                        </span>
+
+                        <a href="{% url 'variant_page' variant.id %}">
+                            {% if variant.product.images.first %}
+                            <img src="{{ variant.product.images.first.image.url }}"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             {% endif %}
-                        </div>
-                        
-                        <a href="{% url 'add_to_wishlist' variant.id %}" 
-                           class="pointer-events-auto w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center hover:scale-110 transition-transform
-                           {% if variant.id in user_wishlist_ids %} text-red-500 {% else %} text-gray-300 hover:text-red-500 {% endif %}">
-                            <span class="material-icons-round text-[18px]">
-                                {% if variant.id in user_wishlist_ids %}favorite{% else %}favorite_border{% endif %}
-                            </span>
                         </a>
+
+                        <div class="absolute inset-x-0 bottom-0 p-4 sm:p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-zinc-950/50 to-transparent">
+                            <a href="{% url 'add_to_cart' variant.id %}"
+                                class="w-full bg-white text-zinc-950 py-3 rounded-xl font-black text-[9px] sm:text-[10px] uppercase tracking-widest text-center block hover:bg-amber-500 transition-colors">
+                                Quick Add +
+                            </a>
+                        </div>
                     </div>
 
-                    <a href="{% url 'variant_page' variant.id %}" class="block relative aspect-[4/5] bg-[#F8F9FA] overflow-hidden p-6 flex items-center justify-center">
-                        {% if variant.product.images.first %}
-                            <img src="{{ variant.product.images.first.image.url }}" alt="{{ variant.product.name }}" 
-                                 class="product-image w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-out">
-                        {% else %}
-                            <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                <span class="material-icons text-4xl">inventory_2</span>
-                            </div>
-                        {% endif %}
-                    </a>
-
-                    <div class="p-5 flex flex-col flex-grow">
-                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-1">{{ variant.product.brand }}</p>
-                        <a href="{% url 'variant_page' variant.id %}" class="text-sm font-medium text-gray-900 line-clamp-2 hover:text-[#D8A25E] transition-colors mb-3 leading-tight">
+                    <div class="px-2">
+                        <p class="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-1">
+                            {{ variant.product.brand }}
+                        </p>
+                        <h4 class="text-sm sm:text-md font-bold text-zinc-900 group-hover:text-amber-600 transition-colors mb-1">
                             {{ variant.product.name }}
-                        </a>
-                        
-                        <div class="mt-auto pt-4 flex items-center justify-between">
-                            <div>
-                                <span class="text-lg font-bold text-gray-900">₹{{ variant.selling_price }}</span>
-                                </div>
-                        </div>
-
-                        <a href="{% url 'add_to_cart' variant.id %}" 
-                           class="mt-4 w-full py-2.5 rounded-xl bg-gray-50 text-black text-sm font-semibold flex items-center justify-center gap-2 group-hover:bg-black group-hover:text-white transition-colors duration-300 border border-gray-100 group-hover:border-black">
-                            <span class="material-icons text-[18px]">add_shopping_cart</span> Add to Cart
-                        </a>
+                        </h4>
+                        <p class="text-base sm:text-lg font-black text-zinc-950">₹{{ variant.selling_price }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -247,66 +225,57 @@
 
     </main>
 
-    <footer class="bg-white border-t border-gray-200 pt-16 pb-8 mt-auto">
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-                
-                <div class="lg:col-span-2">
-                    <img src="{% static 'images/shopix_logo.jpeg' %}" alt="Shopix Logo" class="h-12 w-auto object-contain mb-6">
-                    <p class="text-gray-500 text-sm leading-relaxed max-w-sm mb-6">
-                        Shopix is your ultimate destination for premium fashion, latest electronics, and lifestyle products. Quality without compromise.
+    <footer class="bg-zinc-950 text-white mt-12 sm:mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-12 sm:py-20">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+                <div class="col-span-1">
+                    <span class="text-2xl sm:text-3xl font-black tracking-tighter italic">SHOP<span class="text-amber-500">IX.</span></span>
+                    <p class="mt-6 text-zinc-500 text-sm leading-relaxed max-w-xs">
+                        Defining the future of retail through premium craftsmanship and curated aesthetics since 2026.
                     </p>
-                    <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-colors">
-                            <span class="font-bold text-lg">f</span>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-colors">
-                            <span class="font-bold text-lg">𝕏</span>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-colors">
-                            <span class="font-bold text-lg">in</span>
-                        </a>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 lg:col-span-2">
+                    <div>
+                        <h5 class="font-black text-amber-500 uppercase text-[10px] tracking-[0.3em] mb-6 sm:mb-8">Store</h5>
+                        <ul class="space-y-3 sm:space-y-4 text-sm font-bold text-zinc-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Collection</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Winter Sale</a></li>
+                            <li><a href="#new-arrivals" class="hover:text-white transition-colors">New Arrivals</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 class="font-black text-amber-500 uppercase text-[10px] tracking-[0.3em] mb-6 sm:mb-8">Support</h5>
+                        <ul class="space-y-3 sm:space-y-4 text-sm font-bold text-zinc-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Shipping Info</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Returns</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        </ul>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-sm">Shop</h4>
-                    <ul class="space-y-4 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-black transition-colors">New Arrivals</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Best Sellers</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Electronics</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Fashion</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-sm">Company</h4>
-                    <ul class="space-y-4 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-black transition-colors">About Us</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Careers</a></li>
-                        <li><a href="{% url 'sellerregister' %}" class="hover:text-black transition-colors">Sell on Shopix</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-sm">Support</h4>
-                    <ul class="space-y-4 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-black transition-colors">Help Center</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Shipping Info</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Returns & Exchanges</a></li>
-                        <li><a href="#" class="hover:text-black transition-colors">Track Order</a></li>
-                    </ul>
+                    <h5 class="font-black text-amber-500 uppercase text-[10px] tracking-[0.3em] mb-6 sm:mb-8">Newsletter</h5>
+                    <form class="flex flex-col gap-3">
+                        <input type="email" placeholder="email@address.com"
+                            class="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 w-full">
+                        <button class="bg-white text-zinc-950 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-500 transition-colors">
+                            Subscribe
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <div class="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-400">&copy; 2026 Shopix. All rights reserved.</p>
-                <div class="flex gap-6 text-sm text-gray-400">
-                    <a href="#" class="hover:text-black">Privacy Policy</a>
-                    <a href="#" class="hover:text-black">Terms of Service</a>
+            <div class="border-t border-zinc-900 mt-12 sm:mt-20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-[9px] font-bold text-zinc-600 uppercase tracking-[0.5em] text-center md:text-left">
+                    &copy; 2026 SHOPIX ONLINE STORE.
+                </p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-zinc-600 hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-zinc-600 hover:text-white transition-colors"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
         </div>
     </footer>
-
 </body>
 </html>

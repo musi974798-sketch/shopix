@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -9,6 +11,8 @@ from core.adapter import get_redirect_by_role
 from customer.models import *
 from pro1 import settings
 from .models import *
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from seller.models import *
 import random
@@ -87,63 +91,58 @@ def customer_register(request):
 
 def seller_register(request):
     if request.method == "POST":
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-
-        if password != confirm_password:
+        data = request.POST
+        files = request.FILES
+        
+        if data.get('password') != data.get('confirm_password'):
             messages.error(request, 'Passwords do not match.')
             return render(request, 'core_templates/seller_register.html')
 
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email=data.get('email')).exists():
             messages.error(request, 'Email already exists.')
             return render(request, 'core_templates/seller_register.html')
 
-        if User.objects.filter(phone_number=phone).exists():
-            messages.error(request, 'Phone number already registered.')
-            return render(request, 'core_templates/seller_register.html')
+        doc1 = files.get('document_1')
+        doc2 = files.get('document_2')
+        
+        path1 = default_storage.save(f'tmp/docs/{doc1.name}', ContentFile(doc1.read())) if doc1 else None
+        path2 = default_storage.save(f'tmp/docs/{doc2.name}', ContentFile(doc2.read())) if doc2 else None
 
         otp = str(random.randint(100000, 999999))
-
         request.session['register_data'] = {
-            'first_name': first_name,
-            'last_name': last_name,
-            'email': email,
-            'phone': phone,
-            'password': password,
-            'role': 'SELLER'
+            'first_name': data.get('first_name'),
+            'last_name': data.get('last_name'),
+            'email': data.get('email'),
+            'phone': data.get('phone'),
+            'password': data.get('password'),
+            'role': 'SELLER',
+            'shop_name': data.get('shop_name'),
+            'account_number': data.get('account_number'),
+            'ifsc_code': data.get('ifsc_code'),
+            'branch_name': data.get('branch_name'),
+            'doc1_path': path1,
+            'doc2_path': path2,
         }
-
         request.session['otp'] = otp
 
         send_mail(
-            'Your OTP Code',
+            'Verify your Email',
             f'Your OTP is {otp}',
             settings.EMAIL_HOST_USER,
-            [email],
-            fail_silently=False,
+            [data.get('email')],
         )
 
-        messages.success(request, 'OTP sent to your email. Please verify.')
         return redirect('verify_otp')
 
     return render(request, 'core_templates/seller_register.html')
 
 def verify_otp(request):
     if request.method == "POST":
-        entered_otp = request.POST.get('otp')
+        user_otp = request.POST.get('otp')
         session_otp = request.session.get('otp')
         data = request.session.get('register_data')
 
-        if not session_otp or not data:
-            messages.error(request, "Session expired. Please register again.")
-            return redirect('customer_register')
-
-        if entered_otp == session_otp:
-
+        if user_otp == session_otp:
             user = User.objects.create_user(
                 username=data['email'],
                 email=data['email'],
@@ -151,19 +150,28 @@ def verify_otp(request):
                 first_name=data['first_name'],
                 last_name=data['last_name'],
                 phone_number=data['phone'],
-                role=data['role']
+                role='SELLER',
+                is_active=False
             )
 
-            if data['role'] == 'SELLER':
-                SellerProfile.objects.create(user=user)
+            profile = SellerProfile.objects.create(
+                user=user,
+                shop_name=data['shop_name'],
+                account_number=data['account_number'],
+                ifsc_code=data['ifsc_code'],
+                branch_name=data['branch_name']
+            )
 
-            request.session.flush()
+            if data['doc1_path']:
+                profile.document_1.save(os.path.basename(data['doc1_path']), default_storage.open(data['doc1_path']))
+            if data['doc2_path']:
+                profile.document_2.save(os.path.basename(data['doc2_path']), default_storage.open(data['doc2_path']))
 
-            messages.success(request, "Account created successfully!")
+            messages.success(request, "Registration successful! Please wait for Admin approval.")
             return redirect('login')
         else:
-            messages.error(request, "Invalid OTP")
-
+            messages.error(request, "Invalid OTP.")
+            
     return render(request, 'core_templates/verify_otp.html')
 
 
@@ -187,6 +195,7 @@ def home_view(request):
             wishlist__user=request.user
         ).values_list('variant_id', flat=True))
 
+    print(products)
     context = {
         'products': products,
         'user_wishlist_ids': user_wishlist_ids,

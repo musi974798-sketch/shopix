@@ -3,101 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order History | Shopix</title>
+    <title>My Orders | Shopix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .order-card:hover { transform: translateY(-2px); transition: all 0.3s ease; }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased text-gray-800">
 
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-indigo-600 tracking-tight">Shopix</a>
+                    <a href="/" class="text-2xl font-black text-indigo-600 tracking-tighter">SHOPIX</a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium text-gray-500">Welcome, {{ request.user.username }}</span>
+                    <div class="hidden sm:block text-right">
+                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Customer</p>
+                        <p class="text-sm font-semibold text-gray-900">{{ request.user.username }}</p>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border-2 border-white shadow-sm">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
                 </div>
             </div>
         </div>
+    </nav>
 
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
-        <div class="sm:flex sm:items-center sm:justify-between mb-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Order History</h1>
-                <p class="mt-2 text-sm text-gray-500">Check the status of recent orders, manage returns, and discover similar products.</p>
+                <nav class="flex mb-2" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <li><a href="/" class="hover:text-indigo-600">Home</a></li>
+                        <li><i class="fas fa-chevron-right text-[10px] mx-1"></i></li>
+                        <li class="text-indigo-600">Order History</li>
+                    </ol>
+                </nav>
+                <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Order History</h1>
+                <p class="mt-2 text-gray-500">Manage your recent purchases and track shipments.</p>
             </div>
             
-            <div class="mt-4 sm:mt-0">
-                <label for="dateFilter" class="sr-only">Filter orders</label>
-                <div class="relative">
-                    <select id="dateFilter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm bg-white border cursor-pointer">
-                        <option value="all">All Orders</option>
-                        <option value="2months">Last 60 Days</option>
-                    </select>
+            <div class="inline-flex items-center bg-white p-1.5 rounded-xl shadow-sm border border-gray-200">
+                <label for="dateFilter" class="sr-only">Filter</label>
+                <div class="flex items-center px-3 border-r border-gray-100">
+                    <i class="fas fa-filter text-gray-400 text-sm"></i>
                 </div>
+                <select id="dateFilter" class="pl-3 pr-8 py-2 text-sm font-bold text-gray-700 bg-transparent focus:outline-none cursor-pointer">
+                    <option value="all">All Orders</option>
+                    <option value="2months">Last 60 Days</option>
+                </select>
             </div>
         </div>
 
         <div class="space-y-8">
             {% if orders %}
                 {% for order in orders %}
-                    <div class="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
+                    <div class="order-card bg-white border border-gray-200 shadow-sm rounded-2xl overflow-hidden ring-1 ring-black/5">
                         
-                        <div class="bg-gray-50 border-b border-gray-200 px-4 py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4 sm:gap-x-8 text-sm">
+                        <div class="bg-gray-50/50 border-b border-gray-200 px-6 py-4 flex flex-wrap items-center justify-between gap-y-4">
+                            <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
                                 <div>
-                                    <dt class="font-medium text-gray-900">Order number</dt>
-                                    <dd class="mt-1 text-gray-500">#{{ order.id }}</dd>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Order ID</p>
+                                    <p class="text-sm font-bold text-gray-900">#{{ order.razorpay_order_id|default:order.id }}</p>
                                 </div>
                                 <div>
-                                    <dt class="font-medium text-gray-900">Date placed</dt>
-                                    <dd class="mt-1 text-gray-500"><time datetime="{{ order.ordered_at|date:'Y-m-d' }}">{{ order.ordered_at|date:"M d, Y" }}</time></dd>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date Placed</p>
+                                    <p class="text-sm font-semibold text-gray-700">{{ order.ordered_at|date:"M d, Y" }}</p>
                                 </div>
                                 <div>
-                                    <dt class="font-medium text-gray-900">Total amount</dt>
-                                    <dd class="mt-1 font-medium text-gray-900">${{ order.total_price|default:"0.00" }}</dd>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total</p>
+                                    <p class="text-sm font-extrabold text-indigo-600">₹{{ order.total_amount }}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <a href="#" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                                    View Invoice
+                            <div class="flex items-center gap-3">
+                                <span class="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-full bg-green-100 text-green-700 border border-green-200">
+                                    <i class="fas fa-check-circle mr-1"></i> Paid
+                                </span>
+                                <a href="#" class="p-2 text-gray-400 hover:text-indigo-600 transition-colors" title="Download Invoice">
+                                    <i class="fas fa-file-invoice-dollar text-lg"></i>
                                 </a>
                             </div>
                         </div>
 
-                        <ul role="list" class="divide-y divide-gray-200">
+                        <ul role="list" class="divide-y divide-gray-100">
                             {% for item in order.items.all %}
-                                <li class="p-4 sm:p-6 flex items-center sm:items-start gap-4 sm:gap-6">
-                                    
-                                    <div class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg overflow-hidden border border-gray-100 flex items-center justify-center">
-                                        {% if item.product.image %}
-                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-center object-cover">
-                                        {% else %}
-                                            <i class="fas fa-box text-gray-400 text-2xl"></i>
-                                        {% endif %}
+                                <li class="p-6 flex flex-col sm:flex-row sm:items-center gap-6">
+                                    <div class="flex-shrink-0 w-24 h-24 bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm flex items-center justify-center">
+                                        {% with item.variant.product.images.all as images %}
+                                            {% if images %}
+                                                <img src="{{ images.0.image.url }}" alt="Product" class="w-full h-full object-contain p-2">
+                                            {% else %}
+                                                <i class="fas fa-image text-gray-200 text-3xl"></i>
+                                            {% endif %}
+                                        {% endwith %}
                                     </div>
 
-                                    <div class="flex-1 flex flex-col justify-between">
-                                        <div class="sm:flex sm:justify-between sm:items-start">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                                             <div>
-                                                <h4 class="text-base font-medium text-gray-900">
-                                                    {{ item.product.name|default:"Product Name" }}
+                                                <h4 class="text-lg font-bold text-gray-900 truncate">
+                                                    {{ item.variant.product.name }}
                                                 </h4>
-                                                <p class="mt-1 text-sm text-gray-500 hidden sm:block">
-                                                    {{ item.product.description|truncatewords:15 }}
+                                                <p class="text-sm text-gray-500 mt-0.5 font-medium italic">
+                                                    Qty: {{ item.quantity }} &times; ₹{{ item.price_at_purchase }}
                                                 </p>
-                                                <p class="mt-1 text-sm font-medium text-gray-900 sm:hidden">${{ item.price }}</p>
                                             </div>
-                                            <div class="mt-4 sm:mt-0 sm:ml-6 text-right">
-                                                <p class="text-sm font-medium text-gray-900 hidden sm:block">${{ item.price }}</p>
-                                                <p class="text-sm text-gray-500 mt-1">Qty: {{ item.quantity }}</p>
+                                            <div class="mt-4 sm:mt-0 text-left sm:text-right">
+                                                <p class="text-lg font-black text-gray-900">₹{{ item.get_total_item_price|default:item.price_at_purchase }}</p>
                                             </div>
                                         </div>
-                                        <div class="mt-4 flex text-sm">
-                                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors flex items-center gap-1">
-                                                <i class="fas fa-redo-alt text-xs"></i> Buy again
+                                        <div class="mt-4 flex flex-wrap gap-4">
+                                            <a href="{% url 'variant_page' item.variant.id %}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 uppercase tracking-wide">
+                                                <i class="fas fa-redo-alt"></i> Buy It Again
+                                            </a>
+                                            <span class="text-gray-200">|</span>
+                                            <a href="{% url 'variant_page' item.variant.id %}" class="text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center gap-1.5 uppercase tracking-wide">
+                                                <i class="fas fa-star text-yellow-400"></i> Leave a Review
                                             </a>
                                         </div>
                                     </div>
@@ -107,13 +131,15 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
-                    <i class="fas fa-shopping-bag text-gray-300 text-5xl mb-4"></i>
-                    <h3 class="mt-2 text-lg font-medium text-gray-900">No orders found</h3>
-                    <p class="mt-1 text-sm text-gray-500">We couldn't find any orders matching your current filter.</p>
-                    <div class="mt-6">
-                        <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Start Shopping
+                <div class="text-center py-20 bg-white rounded-3xl shadow-sm border-2 border-dashed border-gray-200">
+                    <div class="h-20 w-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shopping-basket text-indigo-300 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">No orders yet</h3>
+                    <p class="mt-2 text-gray-500 max-w-xs mx-auto">Once you start shopping, your purchase history will appear here.</p>
+                    <div class="mt-8">
+                        <a href="/" class="inline-flex items-center px-8 py-3 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">
+                            Browse Products
                         </a>
                     </div>
                 </div>
@@ -126,26 +152,18 @@
             const filterDropdown = document.getElementById("dateFilter");
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Set the dropdown to the currently active filter from the URL
+            // Sync dropdown with URL
             if (urlParams.get("filter") === "2months") {
                 filterDropdown.value = "2months";
-            } else {
-                filterDropdown.value = "all";
             }
 
-            // Listen for changes on the dropdown
             filterDropdown.addEventListener("change", (e) => {
-                const selectedValue = e.target.value;
                 const url = new URL(window.location.href);
-
-                if (selectedValue === "2months") {
+                if (e.target.value === "2months") {
                     url.searchParams.set("filter", "2months");
                 } else {
-                    // Remove the filter parameter for 'All Orders'
                     url.searchParams.delete("filter");
                 }
-
-                // Redirect to the new URL, triggering the Django view logic
                 window.location.href = url.toString();
             });
         });

@@ -119,45 +119,27 @@
     </div>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        var options = {
-            "key": "{{ key }}",
-            "amount": "{{ payment.amount }}",
-            "currency": "INR",
-            "order_id": "{{ payment.razorpay_order_id }}",
-            
-            // Handle modal closure
-            "modal": {
-                "ondismiss": function(){
-                    // Reset button state if user closes modal without paying
-                    document.getElementById('btn-text').textContent = 'Pay ₹{{ amount_rupees }}';
-                    document.getElementById('btn-icon').classList.remove('hidden');
-                    document.getElementById('btn-spinner').classList.add('hidden');
-                    document.getElementById('pay-btn').classList.remove('opacity-90', 'cursor-not-allowed');
-                }
-            },
+var options = {
+    "key": "{{ key }}",
+    "amount": "{{ payment.amount }}",
+    "currency": "INR",
+    "order_id": "{{ payment.razorpay_order_id }}",
 
-            "handler": function (response){
-                // Redirect with payment details on success
-                window.location.href = "/payment-success/?payment_id=" + response.razorpay_payment_id +
-                                       "&order_id=" + response.razorpay_order_id +
-                                       "&signature=" + response.razorpay_signature;
-            }
-        };
+    "handler": function (response){
+        // 🔥 redirect with payment details
+        window.location.href = "/payment-success/?payment_id=" + response.razorpay_payment_id +
+                               "&order_id=" + response.razorpay_order_id +
+                               "&signature=" + response.razorpay_signature;
+    }
+};
 
-        var rzp = new Razorpay(options);
+var rzp = new Razorpay(options);
 
-        document.getElementById('pay-btn').onclick = function(e){
-            // Show loading state on button click
-            const btn = document.getElementById('pay-btn');
-            document.getElementById('btn-text').textContent = 'Opening Secure Gateway...';
-            document.getElementById('btn-icon').classList.add('hidden');
-            document.getElementById('btn-spinner').classList.remove('hidden');
-            btn.classList.add('opacity-90', 'cursor-not-allowed');
-
-            // Open Razorpay Modal
-            rzp.open();
-        }
-    </script>
+document.getElementById('pay-btn').onclick = function(e){
+    rzp.open();
+}
+</script>
 </body>
 </html>

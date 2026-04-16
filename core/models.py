@@ -28,6 +28,8 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.username
+    
+
 
 class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

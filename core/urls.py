@@ -12,6 +12,7 @@ urlpatterns = [
     path('',views.home_view,name='home'),
     path('product/<int:id>/', views.single_variant_view, name='single_fetch'),
     path('core_product/', views.core_product, name='core_product'),
+    path('products/', views.core_product, name='products'),
     # path('search/', views.search_view, name='search'),
 
 ]

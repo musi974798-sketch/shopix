@@ -1,4 +1,4 @@
-from datetime import timedelta, timezone
+from datetime import timedelta
 
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import *
@@ -13,6 +13,11 @@ from django.db.models import Q
 import razorpay
 from django.conf import settings
 from core.decorators import customer_required
+from django.utils import timezone
+
+
+
+
 #from django.contrib.auth import logout
 #from datetime import timedelta
 #rom django.utils import timezone
@@ -540,14 +545,28 @@ def order_confirmation(request,order_id):
 
 
 def order_history(request):
-    orders = Order.objects.filter(user=request.user).prefetch_related('items').order_by('-ordered_at')
+    # 1. Fetch orders with prefetch_related for the 'items' related name
+    # We also prefetch 'items__variant__product' to get product names without extra queries
+    orders = Order.objects.filter(user=request.user)\
+        .prefetch_related('items__variant__product__images')\
+        .order_by('-ordered_at')
 
+    # 2. Handle Filtering
     filter_type = request.GET.get("filter")
     if filter_type == "2months":
-        three_month_ago = timezone.now() - timedelta(days=60)
-        orders = orders.filter(ordered_at__gte=three_month_ago)
+        two_months_ago = timezone.now() - timedelta(days=60)
+        orders = orders.filter(ordered_at__gte=two_months_ago)
+    elif filter_type == "year":
+        one_year_ago = timezone.now() - timedelta(days=365)
+        orders = orders.filter(ordered_at__gte=one_year_ago)
 
-    return render(request,"customer_templates/order_history.html",{"orders":orders})
+    # 3. Context Data
+    context = {
+        "orders": orders,
+        "filter_type": filter_type,
+    }
+
+    return render(request, "customer_templates/order_history.html", context)
 
 
 
@@ -640,19 +659,28 @@ def add_review(request, product_id):
         # 2. Safety check: Ensure they aren't empty
         if not rating_str or not comment:
             messages.error(request, "Please provide both a rating and a comment.")
-            return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+            variant = ProductVariant.objects.filter(product=product).first()
+            if variant:
+                return redirect('variant_page', id=variant.id)
+            return redirect('home')
 
         # 3. CRITICAL: Convert the string rating to an Integer!
         try:
             rating = int(rating_str)
         except ValueError:
             messages.error(request, "Invalid rating submitted.")
-            return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+            variant = ProductVariant.objects.filter(product=product).first()
+            if variant:
+                return redirect('variant_page', id=variant.id)
+            return redirect('home')
 
         # 4. Check if user already reviewed this product
         if Review.objects.filter(user=request.user, product=product).exists():
             messages.error(request, "You have already reviewed this product.")
-            return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+            variant = ProductVariant.objects.filter(product=product).first()
+            if variant:
+                return redirect('variant_page', id=variant.id)
+            return redirect('home')
 
         # 5. Save the review!
         Review.objects.create(
@@ -663,7 +691,10 @@ def add_review(request, product_id):
         )
         
         messages.success(request, "Thank you! Your review has been submitted.")
-        return redirect(request.META.get('HTTP_REFERER', f'/product/{product_id}/'))
+        variant = ProductVariant.objects.filter(product=product).first()
+        if variant:
+            return redirect('variant_page', id=variant.id)
+        return redirect('home')
         
     return redirect('home')
 
