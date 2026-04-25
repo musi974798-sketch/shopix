@@ -18,6 +18,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-key-here')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
 # -----------------------------
 # Application Definition
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # Your Apps
+    # Your Apps
     'admin_app',
     'core.apps.CoreConfig',
     'customer',
@@ -41,6 +43,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    # Google Provider
 
     # Google Provider
     'allauth.socialaccount.providers.google',
@@ -60,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    # Allauth Middleware
     # Allauth Middleware
     'allauth.account.middleware.AccountMiddleware',
 ]
@@ -176,9 +181,11 @@ STATICFILES_DIRS = [
 # Media Files
 # -----------------------------
 MEDIA_URL = "/media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # -----------------------------
+# Email Configuration (OTP / Verification)
 # Email Configuration (OTP / Verification)
 # -----------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
